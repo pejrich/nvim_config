@@ -25,12 +25,18 @@ local M = {
             target = '^(IO%.inspect%()().-(%))()$',
           },
         },
-        ['a'] = {
-          add = { 'fn -> ', ' end' },
-          find = 'fn .- -> .- end',
-          delete = '^(fn .- -> )().-( end)()$',
+        ['c'] = {
+          add = function()
+            local config = require 'nvim-surround.config'
+            local result = config.get_input 'Enter call name: '
+            if result then
+              return { { result .. '(' }, { ')' } }
+            end
+          end,
+          find = '(%u%a+%.)*[%w_]-%b()',
+          delete = '^([%u%a%w%._]-%()().-(%))()$',
           change = {
-            target = '^(fn .- -> )().-( end)()$',
+            target = '^([%u%a%w%._]-%()().-(%))()$',
           },
         },
         ['A'] = {

@@ -5,7 +5,27 @@ local M = {
 
     event = 'VeryLazy',
     ---@type Flash.Config
-    opts = {},
+    opts = {
+      jump = {
+        autojump = true,
+      },
+      label = {
+        after = false,
+        before = true,
+      },
+      prompt = {
+        enabled = true,
+        prefix = { { '⚡', 'FlashPromptIcon' } },
+        win_config = {
+          relative = 'editor',
+          width = 1, -- when <=1 it's a percentage of the editor width
+          height = 1,
+          row = -1, -- when negative it's an offset from the bottom
+          col = 0, -- when negative it's an offset from the right
+          zindex = 1000,
+        },
+      },
+    },
     -- stylua: ignore
     keys = {
       { "<leader>t",     mode = { "n", "x", "o" }, function() require("flash").jump() end,              desc = "Flash" },
