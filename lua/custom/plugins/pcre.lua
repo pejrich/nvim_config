@@ -67,8 +67,7 @@ return {
         -- addr = 'lines',
         preview = function(opts, preview_ns, preview_buf)
           -- perl_sub_preview(opts, preview_ns, preview_buf)
-          require('live-command').command_preview(opts, preview_ns, preview_buf)
-          return 1
+          return require('live-command').command_preview(opts, preview_ns, preview_buf)
         end,
       })
     end,

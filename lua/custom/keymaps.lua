@@ -1,5 +1,4 @@
 local wk = require 'which-key'
-
 wk.register({
   g = {
     name = 'Go to',
@@ -15,6 +14,14 @@ wk.register({
     name = 'Find/Files',
     f = { '<cmd>Telescope find_files<cr>', '[F]ind [F]iles' },
     b = { '<cmd>Telescope file_browser path=%:p:h select_buffer=true<CR>', '[F]ile [B]rowser' },
+  },
+  m = {
+    name = '[M]odify',
+    w = {
+      name = '[W]hitespace',
+      l = { '<cmd>s/^ *//g<cr>', '[L]eading', mode = 'v' },
+      t = { '<cmd>s/ *$//g<cr>', '[T]railing', mode = 'v' },
+    },
   },
   b = {
     name = 'Buffer',
