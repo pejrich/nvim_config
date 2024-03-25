@@ -1,13 +1,35 @@
+local function diff_strings(str1, str2)
+  local diff = vim.diff(table.concat(str1), str2, { result_type = 'indices' })
+  return diff
+end
+
+local function newlinesplit(str)
+  local result = {}
+  for line in string.gmatch(str .. '\n', '(.-)\n') do
+    table.insert(result, line)
+  end
+  return result
+end
+
+local function parse_sub_exp(str)
+  local pat, rep, mod = str:match '^%/([^/]+)%/*([^/]*)%/*(.-)$'
+  local sub = 's/' .. (pat or '') .. '/' .. (rep or '') .. '/' .. (mod or '')
+  return sub
+end
+
+local function perform_sub(string, sub_exp)
+  local new_lines =
+    vim.fn.system("perl -CSDA -e 'use utf8;' -e '#line 1 \"PerlSubstitute\"' -pe " .. vim.fn.shellescape(vim.fn.escape(sub_exp, '%!') .. ';'), string)
+  return new_lines
+end
 local function perl_sub(opts)
   local line1 = opts.line1
   local line2 = opts.line2
   local buf = vim.api.nvim_get_current_buf()
   local lines = vim.api.nvim_buf_get_lines(buf, line1 - 1, line2, 0)
-  local new_lines = vim.fn.systemlist(
-    "perl -CSDA -e 'use utf8;' -e '#line 1 \"PerlSubstitute\"' -pe " .. vim.fn.shellescape('s' .. vim.fn.escape(opts.args, '%!') .. ';'),
-    lines
-  )
-  vim.api.nvim_buf_set_lines(buf, line1 - 1, line2, 0, new_lines)
+  local sub_exp = parse_sub_exp(opts.args)
+  local new_lines = perform_sub(lines, sub_exp)
+  vim.api.nvim_buf_set_lines(buf, line1 - 1, line2, 0, newlinesplit(new_lines))
 end
 
 local function perl_sub_preview(opts, preview_ns, preview_buf)
