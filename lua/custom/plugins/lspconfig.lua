@@ -1,9 +1,9 @@
 local lspconfig = require 'lspconfig'
 local configs = require 'lspconfig.configs'
-local elixirLsp = ''
+local elixirLsp = 'lexical'
 local lexical_config = {
   filetypes = { 'elixir', 'eelixir', 'heex' },
-  cmd = { 'ERL_OPTS="+MIscs 2048" /Users/peterrichards/Documents/programming/lexical/_build/dev/package/lexical/bin/start_lexical.sh' },
+  cmd = { 'start_lexical' },
   settings = {},
 }
 
@@ -93,40 +93,40 @@ local M = {
       if not configs.emmet_language_server then
         configs.emmet_language_server = emmet_config
       end
-      if not configs.elixirls then
-        configs.elixirls = {
+      -- if not configs.elixirls then
+      --   configs.elixirls = {
+      --     default_config = {
+      --       filetypes = elixirls_config.filetypes,
+      --       cmd = elixirls_config.cmd,
+      --       settings = elixirls_config.settings,
+      --       root_dir = function(fname)
+      --         return lspconfig.util.root_pattern('mix.exs', '.git')(fname) or vim.loop.os_homedir()
+      --       end,
+      --     },
+      --   }
+      -- end
+      -- lspconfig.elixirls.setup {}
+      -- if elixirLsp == 'lexical' then
+      if not configs.lexical then
+        configs.lexical = {
           default_config = {
-            filetypes = elixirls_config.filetypes,
-            cmd = elixirls_config.cmd,
-            settings = elixirls_config.settings,
+            filetypes = lexical_config.filetypes,
+            cmd = lexical_config.cmd,
             root_dir = function(fname)
               return lspconfig.util.root_pattern('mix.exs', '.git')(fname) or vim.loop.os_homedir()
             end,
+            -- optional settings
+            settings = lexical_config.settings,
           },
         }
       end
-      lspconfig.elixirls.setup {}
-      if elixirLsp == 'lexical' then
-        if not configs.lexical then
-          configs.lexical = {
-            default_config = {
-              filetypes = lexical_config.filetypes,
-              cmd = lexical_config.cmd,
-              root_dir = function(fname)
-                return lspconfig.util.root_pattern('mix.exs', '.git')(fname) or vim.loop.os_homedir()
-              end,
-              -- optional settings
-              settings = lexical_config.settings,
-            },
-          }
-        end
-        lspconfig.lexical.setup {
-          -- optional config
-          -- on_attach = custom_attach,
-          -- keymap('n', 'gd', '<cmd>lua vim.lsp.buf.definition()<cr>', opts),
-          keymap('n', '<leader>li', '<cmd>LspInfo<cr>', opts),
-        }
-      end
+      lspconfig.lexical.setup {
+        -- optional config
+        -- on_attach =  custom_attach,
+        -- keymap('n', 'gd', '<cmd>lua vim.lsp.buf.definition()<cr>', opts),
+        -- keymap('n', '<leader>li', '<cmd>LspInfo<cr>', opts),
+      }
+      -- end
       lspconfig.lua_ls.setup {}
       local keymap = vim.api.nvim_set_keymap
       local opts = { noremap = true, silent = true }

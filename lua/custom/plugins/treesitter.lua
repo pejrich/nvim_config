@@ -48,10 +48,10 @@ local M = {
       },
     },
     cmd = { 'TSUpdateSync', 'TSUpdate', 'TSInstall' },
-    keys = {
-      { '<c-space>', desc = 'Increment selection' },
-      { '<bs>', desc = 'Decrement selection', mode = 'x' },
-    },
+    -- keys = {
+    --   { '<c-space>', desc = 'Increment selection' },
+    --   { '<bs>', desc = 'Decrement selection', mode = 'x' },
+    -- },
     config = function()
       local configs = require 'nvim-treesitter.configs'
       configs.setup {
@@ -95,10 +95,10 @@ local M = {
         incremental_selection = {
           enable = true,
           keymaps = {
-            init_selection = '<C-space>',
-            node_incremental = '<C-space>',
-            scope_incremental = false,
-            node_decremental = '<bs>',
+            init_selection = 'vv', -- set to `false` to disable one of the mappings
+            node_incremental = 'v',
+            -- scope_incremental = 'grc',
+            node_decremental = 'V',
           },
         },
         textobjects = {

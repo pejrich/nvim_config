@@ -11,10 +11,19 @@ local function newlinesplit(str)
   return result
 end
 
-local function parse_sub_exp(str)
-  local pat, rep, mod = str:match '^%/([^/]+)%/*([^/]*)%/*(.-)$'
-  local sub = 's/' .. (pat or '') .. '/' .. (rep or '') .. '/' .. (mod or '')
-  return sub
+local function parse_sub_exp(s)
+  local a, b, c = s:gsub('/', '/\1'):gsub('\\(.)', '\2%1'):gsub('%f[/\2]/', '\0'):gsub('[\1\2]', ''):match '%z(%Z*)%z(%Z*)%z(%Z*)'
+  if a and b and c then
+    return 's/' .. a .. '/' .. b .. '/' .. c
+  end
+  local a, b = s:gsub('/', '/\1'):gsub('\\(.)', '\2%1'):gsub('%f[/\2]/', '\0'):gsub('[\1\2]', ''):match '%z(%Z*)%z(%Z*)'
+  if a and b then
+    return 's/' .. a .. '/' .. b .. '/'
+  end
+  local a = s:gsub('/', '/\1'):gsub('\\(.)', '\2%1'):gsub('%f[/\2]/', '\0'):gsub('[\1\2]', ''):match '%z(%Z*)'
+  if a then
+    return 's/' .. a .. '//'
+  end
 end
 
 local function perform_sub(string, sub_exp)
@@ -45,7 +54,6 @@ local function perl_sub_preview(opts, preview_ns, preview_buf)
       getIndex = 'my @ret; while ("' .. line .. '" =~ /' .. lhs .. '/' .. flags .. ') { push @ret, \\$-[0] . "," . \\$+[0]; }; print join "|", @ret;'
     else
       getIndex = '"' .. vim.fn.escape(line, '"') .. '" =~ /' .. vim.fn.escape(lhs, '"') .. '/; print \\$-[0] . "," . \\$+[0];'
-      -- getIndex = "'" .. vim.fn.escape(line, '%!') .. "' =~ /" .. vim.fn.escape(lhs, '%!') .. "/; print \\$-[0] . ',' . \\$+[0];"
     end
     getIndex = vim.fn.shellescape(getIndex, 0)
     local indexString = vim.fn.system("perl -CSDA -e 'use utf8;' -e '#line 1 \"PerlSubstitute\"' -e " .. '"' .. getIndex .. '"')
@@ -88,7 +96,6 @@ return {
         range = 0,
         -- addr = 'lines',
         preview = function(opts, preview_ns, preview_buf)
-          -- perl_sub_preview(opts, preview_ns, preview_buf)
           return require('live-command').command_preview(opts, preview_ns, preview_buf)
         end,
       })

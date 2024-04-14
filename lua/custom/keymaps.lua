@@ -1,5 +1,12 @@
 local wk = require 'which-key'
 wk.register({
+  e = {
+    d = { '<cmd>lua require("elixir-extras").elixir_view_docs({include_mix_libs=true})<cr>', '[E]lixir [D]ocs' },
+    m = {
+      '<cmd>lua require("elixir-extras").module_complete()<cr>',
+      '[E]lixir Complete [M]odule',
+    },
+  },
   g = {
     name = 'Go to',
     d = { '<cmd>Lspsaga goto_definition<cr>', '[G]o to [D]efinition' },
@@ -12,7 +19,9 @@ wk.register({
   },
   f = {
     name = 'Find/Files',
-    f = { '<cmd>Telescope find_files<cr>', '[F]ind [F]iles' },
+    -- f = { '<cmd>Telescope find_files<cr>', '[F]ind [F]iles' },
+    z = { '<cmd>FzfLua builtin<cr>', '[F]ind F[Z]FLua builtin' },
+    f = { '<cmd>FzfLua files<cr>', '[F]ind [F]iles' },
     b = { '<cmd>Telescope file_browser path=%:p:h select_buffer=true<CR>', '[F]ile [B]rowser' },
   },
   m = {
