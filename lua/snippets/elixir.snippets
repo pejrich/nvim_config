@@ -301,31 +301,25 @@ snippet al atom list
 	~w(${0})a
 
 snippet spc=
-  <span class={"${1: class}"}><%= ${2: value} %></span>
+  <span class={"${1:class}"}><%= ${2:value} %></span>
 
 snippet spc
-  <span class={"${1: class}"}>${2: value}</span>
-
-snippet divc=
-  <div class={"${1: class}"}><%= ${2: value} %></div>
-
-snippet divc
-  <div class={"${1: class}"}>${2: value}</div>
+  <span class={"${1:class}"}>${2:value}</span>
 
 snippet priv
-  @path :code.priv_dir(${1: :slator}) |> Path.join("${2: data/}")
+  @path :code.priv_dir(${1::slator}) |> Path.join("${2:data/}")
   @external_resource @path
-  @data ${3: File}
+  @data ${3:File}
 
 snippet comp
-  def ${1: name}(assigns) do
+  def ${1:name}(assigns) do
     ~H"""
-      ${2: <div></div>}
+      ${2:<div></div>}
     """
   end
 
 snippet attr
-  attr(:${1:name}, :${2:string}, required: true)
+  attr(${1::name}, ${2::string}, required: true)
 
 snippet attd
-  attr(:${1:name}, :${2:string}, default: ${3:default})
+  attr(${1::name}, ${2::string}, default: ${3:default})

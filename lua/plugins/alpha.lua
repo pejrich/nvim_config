@@ -127,17 +127,17 @@ end
 
 function M.on_open()
   local theme = require("theme.highlights")
-  local lualine = require("plugins.lualine")
+  -- local lualine = require("plugins.lualine")
 
-  lualine.hide()
+  -- lualine.hide()
   theme.disable_VertSplit()
 end
 
 function M.on_close()
   local theme = require("theme.highlights")
-  local lualine = require("plugins.lualine")
+  -- local lualine = require("plugins.lualine")
 
-  lualine.show()
+  -- lualine.show()
   theme.enable_VertSplit()
 end
 

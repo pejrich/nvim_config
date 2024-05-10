@@ -28,6 +28,18 @@ local plugins = {
     branch = "main",
     lazy = false,
   },
+  {
+    "projekt0n/github-nvim-theme",
+    lazy = false, -- make sure we load this during startup if it is your main colorscheme
+    priority = 1000, -- make sure to load this before all the other start plugins
+    config = function()
+      require("github-theme").setup({
+        -- ...
+      })
+
+      vim.cmd("colorscheme github_dark")
+    end,
+  },
 
   -- keymaps
   {
@@ -76,8 +88,9 @@ local plugins = {
     end,
   },
   {
-    -- "folke/flash.nvim",
-    dir = "/Users/peterrichards/Downloads/flash.nvim-main",
+    "folke/flash.nvim",
+    -- dir = "/Users/peterrichards/Downloads/flash.nvim-main",
+    -- dir = "/Users/peterrichards/Documents/programming/nvim_plugins/flash.nvim",
     version = "*",
     event = "VeryLazy",
     config = require("plugins.flash").setup,
@@ -93,12 +106,13 @@ local plugins = {
     "ibhagwan/fzf-lua",
     -- optional for icon support
     dependencies = { "nvim-tree/nvim-web-devicons" },
+    -- commit = "86d2aa8",
     config = function()
       -- calling `setup` is optional for customization
       require("fzf-lua").setup({
         "telescope",
         previewers = { builtin = { syntax = true, syntax_limit_b = 0 } },
-        files = { multiprocess = true, file_icons = true, git_icons = true, color_icons = true },
+        files = { cmd = "rg --files --hidden", multiprocess = true, file_icons = true, git_icons = true, color_icons = true },
         grep = { multiprocess = true, file_icons = true, git_icons = true, color_icons = true },
         buffers = {
           file_icons = true, -- show file icons?
@@ -111,6 +125,28 @@ local plugins = {
   { "junegunn/fzf", build = "./install --bin" },
   {
     "RRethy/vim-illuminate",
+    config = function()
+      require("illuminate").setup({
+        providers = {
+          "treesitter",
+          "regex",
+        },
+        delay = 200,
+        large_file_cutoff = 2000,
+      })
+      local function map(key, dir, buffer)
+        vim.keymap.set("n", key, function()
+          require("illuminate")["goto_" .. dir .. "_reference"](false)
+        end, { desc = dir:sub(1, 1):upper() .. dir:sub(2) .. " Reference", buffer = buffer })
+      end
+
+      map("]]", "next")
+      map("[[", "prev")
+    end,
+    keys = {
+      { "]]", desc = "Next Reference" },
+      { "[[", desc = "Prev Reference" },
+    },
   },
   {
     "folke/trouble.nvim",
@@ -323,7 +359,7 @@ local plugins = {
   },
   {
     "akinsho/bufferline.nvim",
-    version = "*",
+    -- version = "*",
     dependencies = {
       "nvim-tree/nvim-web-devicons",
     },
@@ -379,7 +415,7 @@ local plugins = {
   },
   {
     "pejrich/nvim-treesitter-context",
-    version = "*",
+    -- version = "*",
     opts = {
       -- max_lines = 5,
       filter = function(line, ext)
@@ -676,7 +712,7 @@ local plugins = {
   },
   {
     "glepnir/lspsaga.nvim",
-    branch = "main", -- TODO: Go back to stable after the current version is released
+    -- branch = "main", -- TODO: Go back to stable after the current version is released
     event = "BufEnter",
     config = require("plugins.lsp.lspsaga").setup,
   },
@@ -686,20 +722,6 @@ local plugins = {
     branch = "main",
     event = "BufEnter",
     config = require("plugins.lsp.lsp-lines").setup,
-  },
-
-  {
-    "mrcjkb/rustaceanvim",
-    version = "^3",
-    ft = { "rust" },
-  },
-
-  {
-    "saecki/crates.nvim",
-    dependencies = { "nvim-lua/plenary.nvim" },
-    branch = "main",
-    event = { "BufRead Cargo.toml" },
-    config = require("plugins.crates").setup,
   },
 
   {
@@ -831,21 +853,21 @@ local plugins = {
     version = "*",
   },
 
-  {
-    "SuperBo/fugit2.nvim",
-    version = "*",
-    dependencies = {
-      "MunifTanjim/nui.nvim",
-      "nvim-tree/nvim-web-devicons",
-      "nvim-lua/plenary.nvim",
-      {
-        "chrisgrieser/nvim-tinygit",
-        dependencies = { "stevearc/dressing.nvim" },
-      },
-    },
-    cmd = { "Fugit2", "Fugit2Graph" },
-    config = true,
-  },
+  -- {
+  --   "SuperBo/fugit2.nvim",
+  --   version = "*",
+  --   dependencies = {
+  --     "MunifTanjim/nui.nvim",
+  --     "nvim-tree/nvim-web-devicons",
+  --     "nvim-lua/plenary.nvim",
+  --     {
+  --       "chrisgrieser/nvim-tinygit",
+  --       dependencies = { "stevearc/dressing.nvim" },
+  --     },
+  --   },
+  --   cmd = { "Fugit2", "Fugit2Graph" },
+  --   config = true,
+  -- },
   {
     "stevearc/dressing.nvim",
     lazy = true,

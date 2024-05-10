@@ -16,6 +16,12 @@ _G.F = {
   stop_profile = function()
     require("plenary.profile").stop()
   end,
+  delete_file_path = function()
+    vim.cmd("!rm %:p")
+  end,
+  copy_file_path = function()
+    vim.cmd("!echo -n %:p | pbcopy")
+  end,
 }
 
 local default_keymap_options = { noremap = true, silent = true }

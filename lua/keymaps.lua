@@ -115,9 +115,15 @@ K.merge_wk({
   ["!"] = {
     name = "Misc",
     p = {
+      name = "[P]rofile",
       f = { F.start_flame_profile, "Start [P]rofile [F]lame" },
       s = { F.start_profile, "Start [P]rofile" },
       e = { F.stop_profile, "Profile [E]nd" },
+    },
+    f = {
+      name = "[F]ile",
+      c = { F.copy_file_path, "[C]opy [F]ile Path" },
+      ["dd"] = { F.delete_file_path, "[DD]elete Current [F]ile" },
     },
   },
   b = {

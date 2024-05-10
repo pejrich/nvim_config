@@ -125,16 +125,7 @@ function M.setup()
 
   config.emmet_language_server.setup({
     filetypes = {
-      "css",
-      "eruby",
       "html",
-      "htmldjango",
-      "javascriptreact",
-      "less",
-      "pug",
-      "sass",
-      "scss",
-      "typescriptreact",
       "elixir",
       "heex",
     },
