@@ -1,9 +1,9 @@
 local M = {}
 
 M.signs = {
-  Error = "ﮊ",
-  Warn = "󱅧",
-  Hint = "﮸",
+  Error = "",
+  Warn = "",
+  Hint = "",
   Info = "",
 }
 
@@ -11,23 +11,20 @@ function M.setup()
   local lsp = vim.lsp
 
   local config = require("lspconfig")
+  local capabilities = vim.lsp.protocol.make_client_capabilities()
   local mason = require("plugins.lsp.mason")
-
   local lua = require("plugins.lsp.servers.lua")
   local rust = require("plugins.lsp.servers.rust")
-  local ocaml = require("plugins.lsp.servers.ocaml")
-  local rescript = require("plugins.lsp.servers.rescript")
   local typescript = require("plugins.lsp.servers.typescript")
-  local json = require("plugins.lsp.servers.json")
+  -- local json = require("plugins.lsp.servers.json")
   local yaml = require("plugins.lsp.servers.yaml")
-  -- local elixir = require("plugins.lsp.servers.elixir")
-  -- local emmet = require("plugins.lsp.server.emmet")
+  local elixir = require("plugins.lsp.servers.elixir")
+  -- local tailwind = require("plugins.lsp.servers.tailwind")
   vim.diagnostic.config({
     signs = true,
     severity_sort = true,
   })
 
-  local lspconfig = require("lspconfig")
   local configs = require("lspconfig.configs")
   -- local elixir = require("elixir")
 
@@ -110,38 +107,22 @@ function M.setup()
 
   lua.setup(config)
   rust.setup()
-  ocaml.setup(config)
-  rescript.setup(config)
-  -- typescript.setup(config)
-  json.setup(config)
+  typescript.setup(config)
+  -- json.setup(config)
   yaml.setup(config)
-  -- elixir.setup(config)
-  -- elixir.setup({
-  --   nextls = nextls_opts,
-  --   credo = { enable = false },
-  --   elixirls = { enable = true },
-  -- })
-  -- emmet.setup()
+  elixir.setup(config)
+  -- tailwind.setup(config)
 
   config.emmet_language_server.setup({
+    capabilities = capabilities,
     filetypes = {
       "html",
       "elixir",
       "heex",
     },
   })
-  config.bashls.setup({})
   config.cssls.setup({})
-  config.dockerls.setup({})
-  config.docker_compose_language_service.setup({})
   config.html.setup({})
-  config.marksman.setup({})
-  config.nil_ls.setup({})
-  config.ocamllsp.setup({})
-  config.reason_ls.setup({})
-  config.sqlls.setup({})
-  -- config.elixirls.setup({})
-  -- config.tailwindcss.setup({})
 end
 
 return M

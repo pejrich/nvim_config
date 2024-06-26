@@ -10,7 +10,7 @@ function M.setup()
       sync_with_numbered_registers = true,
       cancel_event = "update",
       ignore_registers = { "_" },
-      update_register_on_cycle = false,
+      update_register_on_cycle = true,
     },
     system_clipboard = {
       sync_with_ring = true,
@@ -19,9 +19,9 @@ function M.setup()
       on_yank = false,
       timer = 250,
     },
-    -- preserve_cursor_position = {
-    --   enabled = true,
-    -- },
+    preserve_cursor_position = {
+      enabled = true,
+    },
     -- textobj = {
     --   enabled = true,
     -- },

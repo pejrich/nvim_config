@@ -7,6 +7,11 @@ function M.setup()
   install.compilers = { "gcc" }
 
   plugin.setup({
+    auto_install = true,
+    ignore_install = {},
+
+    sync_install = false,
+
     matchup = {
       enable = true,
     },
@@ -14,7 +19,7 @@ function M.setup()
       enable = true,
       additional_vim_regex_highlighting = false,
       use_languagetree = false,
-      disable = function(_, bufnr)
+      disable = function(lang, bufnr)
         local buf_name = vim.api.nvim_buf_get_name(bufnr)
         local file_size = vim.api.nvim_call_function("getfsize", { buf_name })
         return file_size > 256 * 1024
@@ -23,48 +28,40 @@ function M.setup()
     endwise = {
       enable = true,
     },
-    sync_install = false,
     indent = {
       enable = true,
     },
     incremental_selection = {
       enable = true,
       keymaps = {
-        init_selection = "vv", -- set to `false` to disable one of the mappings
+        init_selection = false, -- set to `false` to disable one of the mappings
         node_incremental = "v",
         -- scope_incremental = 'grc',
         node_decremental = "V",
       },
     },
+    autotag = {
+      enable = true,
+      filetypes = { "html", "xml", "eruby", "heex", "elixir", "embedded_template" },
+    },
     ensure_installed = {
-      "bash",
-      "css",
-      "diff",
-      "dockerfile",
-      "git_rebase",
-      "gitattributes",
-      "gitcommit",
-      "gitignore",
-      "graphql",
       "elixir",
       "heex",
+      "embedded_template",
       "html",
       "javascript",
-      -- "json",
       "lua",
-      "markdown",
-      "markdown_inline",
-      "nix",
-      "ocaml",
-      "ocaml_interface",
-      "regex",
-      "rust",
-      "scss",
-      "sql",
-      "swift",
       "toml",
       "typescript",
+      "css",
+      "json",
+      "markdown",
+      "markdown_inline",
+      "regex",
+      "rust",
       "yaml",
+      "csv",
+      "tsv",
     },
     textobjects = {
       select = {
@@ -142,6 +139,15 @@ function M.setup()
       },
     },
   })
+
+  local injections = [[((sigil
+  (sigil_name) @_sigil_name
+  (quoted_content) @injection.content)
+ (#eq? @_sigil_name "H")
+ (#set! injection.language "heex")
+ (#set! injection.combined))
+]]
+  require("vim.treesitter.query").set("elixir", "injections", injections)
 end
 
 function M.keymaps() end

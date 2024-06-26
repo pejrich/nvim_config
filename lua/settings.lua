@@ -1,6 +1,16 @@
 local g = vim.g
 local opt = vim.opt
+-- replace default search with search by regex
+vim.api.nvim_set_keymap("n", "/", "/\\v", { noremap = true })
+vim.api.nvim_set_keymap("v", "/", "/\\v", { noremap = true })
+-- copy file path to `unnamedplus` clipboard
 
+-- vim.cmd("!echo -n %:p | pbcopy")
+vim.api.nvim_set_keymap("n", "cp", [[:let @+ = expand("%:p")<CR>]], { noremap = true, desc = "Copy file path to `unnamedplus` clipboard" })
+-- command-mode completion
+vim.api.wildmenu = true
+-- Wildmenu ignores case
+vim.api.wildignorecase = true
 g.mapleader = " "
 g.maplocalleader = " "
 vim.cmd("set nrformats+=unsigned")
@@ -22,6 +32,9 @@ opt.tabstop = 2
 opt.expandtab = true
 opt.softtabstop = 2
 opt.shiftwidth = 2
+opt.smartindent = true
+opt.foldlevelstart = 99
+opt.foldmethod = "manual"
 -- Enable mouse mode, can be useful for resizing splits for example!
 opt.mouse = "a"
 
@@ -84,15 +97,6 @@ opt.scrolloff = 10
 opt.hlsearch = true
 vim.keymap.set("n", "<Esc>", "<cmd>nohlsearch<CR>")
 
--- Diagnostic keymaps
-vim.keymap.set("n", "[d", vim.diagnostic.goto_prev, { desc = "Go to previous [D]iagnostic message" })
-vim.keymap.set("n", "]d", vim.diagnostic.goto_next, { desc = "Go to next [D]iagnostic message" })
-vim.keymap.set("n", "<leader>e", vim.diagnostic.open_float, { desc = "Show diagnostic [E]rror messages" })
-vim.keymap.set("n", "<C-h>", "<C-w><C-h>", { desc = "Move focus to the left window" })
-vim.keymap.set("n", "<C-l>", "<C-w><C-l>", { desc = "Move focus to the right window" })
-vim.keymap.set("n", "<C-j>", "<C-w><C-j>", { desc = "Move focus to the lower window" })
-vim.keymap.set("n", "<C-k>", "<C-w><C-k>", { desc = "Move focus to the upper window" })
-
 -- [[ Basic Autocommands ]]
 --  See :help lua-guide-autocommands
 
@@ -113,11 +117,6 @@ opt.number = true
 
 opt.clipboard = "unnamedplus"
 opt.completeopt = "menu,menuone,noselect"
-
-opt.expandtab = true
-opt.shiftwidth = 2
-opt.smartindent = true
-opt.softtabstop = 2
 
 opt.list = true
 

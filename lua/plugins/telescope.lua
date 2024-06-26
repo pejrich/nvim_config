@@ -6,7 +6,8 @@ function M.setup()
   local plugin = require("telescope")
   local actions = require("telescope.actions")
   local editor = require("editor.searchreplace")
-  local trouble = require("trouble.providers.telescope")
+  local trouble = require("trouble.sources.telescope")
+
   local extensions = X.extensions()
   table.insert(extensions, {
     ["ui-select"] = {
@@ -78,7 +79,7 @@ function M.setup()
           -- ["<C-t>"] = actions.preview_scrolling_up,
           -- ["<C-h>"] = actions.preview_scrolling_down,
           ["<D-w>"] = actions.close,
-          ["<C-t>"] = trouble.open_with_trouble,
+          ["<C-t>"] = trouble.open,
         },
         i = {
           ["<S-Down>"] = actions.file_split,
@@ -86,7 +87,7 @@ function M.setup()
           -- ["<C-t>"] = actions.preview_scrolling_up,
           -- ["<C-h>"] = actions.preview_scrolling_down,
           ["<D-w>"] = actions.close,
-          ["<c-t>"] = trouble.open_with_trouble,
+          ["<c-t>"] = trouble.open,
         },
       },
     },
@@ -122,7 +123,7 @@ function M.setup()
   vim.keymap.set("n", "<leader>fd", builtin.diagnostics, { desc = "[F]ind [D]iagnostics" })
   vim.keymap.set("n", "<leader>fr", builtin.resume, { desc = "[F]ind [R]esume" })
   vim.keymap.set("n", "<leader>f.", builtin.oldfiles, { desc = '[F]ind Recent Files ("." for repeat)' })
-  vim.keymap.set("n", "<leader><leader>", builtin.buffers, { desc = "[ ] Find existing buffers" })
+  vim.keymap.set("n", "<leader><leader><leader>", builtin.buffers, { desc = "[ ] Find existing buffers" })
 
   -- Slightly advanced example of overriding default behavior and theme
   vim.keymap.set("n", "<leader>/", function()
@@ -177,7 +178,7 @@ function X.extensions()
       display_stat = false,
       hijack_netrw = false,
       use_fd = true,
-      git_status = true,
+      git_status = false,
       mappings = {
         ["i"] = {
           ["<D-n>"] = fb.create,
@@ -236,7 +237,7 @@ function M.keymaps()
   K.merge_wk({
     f = {
       c = { m.open_command_finder, "Open [c]ommand finder" },
-      h = { "<cmd>Telescope highlights<CR>", "Open [h]ighlights finder" },
+      h = { "<cmd>Telescope help_tags<CR>", "[H]elp tags" },
     },
     l = {
       name = "[L]SP",
@@ -274,7 +275,7 @@ function m.open_file_browser()
   extensions.file_browser.file_browser({
     cwd = "%:p:h",
     hidden = true,
-    git_status = true,
+    git_status = false,
     respect_gitignore = false,
     grouped = true,
     select_buffer = true,

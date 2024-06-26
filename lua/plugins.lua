@@ -1,5 +1,9 @@
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
 
+vim.cmd("let g:csv_nomap_sp = 1")
+vim.cmd("let g:csv_nomap_space = 1")
+vim.cmd("let g:csv_nomap_cr = 1")
+vim.cmd("let g:csv_nomap_bs = 1")
 if not vim.loop.fs_stat(lazypath) then
   vim.fn.system({
     "git",
@@ -22,11 +26,33 @@ local plugins = {
     version = "*",
   },
 
+  {
+    dir = "~/Documents/programming/nvim_plugins/mrs_doubtfire.nvim",
+    config = function()
+      require("mrs_doubtfire").setup({})
+    end,
+  },
+  {
+    dir = "~/Documents/programming/nvim_plugins/lopsided.nvim",
+    config = function()
+      require("lopsided").setup({})
+    end,
+  },
+  {
+    dir = "~/Documents/programming/nvim_plugins/chuck_and_grab.nvim",
+    config = function()
+      require("chuck_and_grab").setup({})
+    end,
+  },
+
   -- theming
   {
     "rktjmp/lush.nvim",
     branch = "main",
     lazy = false,
+  },
+  {
+    "tpope/vim-abolish",
   },
   {
     "projekt0n/github-nvim-theme",
@@ -77,6 +103,7 @@ local plugins = {
   },
   {
     "gbprod/substitute.nvim",
+    branch = "main",
     config = function()
       require("substitute").setup({
         on_substitute = require("yanky.integration").substitute(),
@@ -91,17 +118,17 @@ local plugins = {
     "folke/flash.nvim",
     -- dir = "/Users/peterrichards/Downloads/flash.nvim-main",
     -- dir = "/Users/peterrichards/Documents/programming/nvim_plugins/flash.nvim",
-    version = "*",
+    branch = "main",
     event = "VeryLazy",
     config = require("plugins.flash").setup,
   },
 
-  {
-    "xiyaowong/virtcolumn.nvim",
-    version = "*",
-    event = "BufEnter",
-    config = require("plugins.virtcolumn").setup,
-  },
+  -- {
+  --   "xiyaowong/virtcolumn.nvim",
+  --   version = "*",
+  --   event = "BufEnter",
+  --   config = require("plugins.virtcolumn").setup,
+  -- },
   {
     "ibhagwan/fzf-lua",
     -- optional for icon support
@@ -112,7 +139,7 @@ local plugins = {
       require("fzf-lua").setup({
         "telescope",
         previewers = { builtin = { syntax = true, syntax_limit_b = 0 } },
-        files = { cmd = "rg --files --hidden", multiprocess = true, file_icons = true, git_icons = true, color_icons = true },
+        files = { cmd = "rg --files --hidden", multiprocess = true, file_icons = true, git_icons = false, color_icons = true },
         grep = { multiprocess = true, file_icons = true, git_icons = true, color_icons = true },
         buffers = {
           file_icons = true, -- show file icons?
@@ -150,11 +177,13 @@ local plugins = {
   },
   {
     "folke/trouble.nvim",
+    branch = "main",
     dependencies = { "nvim-tree/nvim-web-devicons" },
     config = require("plugins.trouble").setup,
   },
   {
     "gbprod/stay-in-place.nvim",
+    branch = "main",
     config = function()
       require("stay-in-place").setup({
         -- your configuration comes here
@@ -175,22 +204,6 @@ local plugins = {
       require("unimpaired").setup()
     end,
   },
-  -- {
-  --   "mg979/vim-visual-multi",
-  --   lazy = false,
-  --   config = function()
-  --     vim.g.VM_default_mappings = 0
-  --     vim.g.VM_maps = {
-  --       ["Find Under"] = "<C-x>",
-  --       ["Find Subword Under"] = "<C-x>",
-  --     }
-  --     vim.keymap.set("n", "<C-x>", "<Plug>(VM-Find-Under)")
-  --     -- Tried these as well but they do not work.
-  --     -- vim.g.VM_maps['Find Subword Under'] = "<C-x>"
-  --     -- vim.g.VM_maps["Select Cursor Down"] = '<M-u>'
-  --     -- vim.g.VM_maps["Select Cursor Up"]   = '<M-d>'
-  --   end,
-  -- },
   {
     "NvChad/nvim-colorizer.lua",
     config = function()
@@ -209,64 +222,9 @@ local plugins = {
     end,
   },
   -- {
-  --   "elixir-tools/elixir-tools.nvim",
-  --   version = "*",
-  --   event = { "BufReadPre", "BufNewFile" },
-  --   config = require("plugins.lsp.servers.elixir").setup,
-  --   dependencies = {
-  --     "nvim-lua/plenary.nvim",
-  --   },
+  --   "vidocqh/auto-indent.nvim",
+  --   opts = {},
   -- },
-  -- {
-  --   "elixir-tools/elixir-tools.nvim",
-  --   version = "*",
-  --   -- dev = true,
-  --   event = { "BufReadPre", "BufNewFile" },
-  --   -- config = function()
-  --   --   local elixir = require("elixir")
-  --   --   local nextls_opts
-  --   --   if vim.env.NEXTLS_LOCAL == "1" then
-  --   --     nextls_opts = {
-  --   --       enable = true,
-  --   --       port = 9000,
-  --   --       spitfire = true,
-  --   --       init_options = {
-  --   --         experimental = {
-  --   --           completions = {
-  --   --             enable = true,
-  --   --           },
-  --   --         },
-  --   --       },
-  --   --     }
-  --   --   else
-  --   --     nextls_opts = {
-  --   --       enable = true,
-  --   --       spitfire = true,
-  --   --       init_options = {
-  --   --         experimental = {
-  --   --           completions = {
-  --   --             enable = true,
-  --   --           },
-  --   --         },
-  --   --       },
-  --   --     }
-  --   --   end
-  --   --
-  --   --   elixir.setup({
-  --   --     nextls = nextls_opts,
-  --   --     credo = { enable = false },
-  --   --     elixirls = { enable = false },
-  --   --   })
-  --   -- end,
-  --   dependencies = {
-  --     "nvim-lua/plenary.nvim",
-  --     "mhanberg/workspace-folders.nvim",
-  --   },
-  -- },
-  {
-    "vidocqh/auto-indent.nvim",
-    opts = {},
-  },
   {
     "emmanueltouzery/elixir-extras.nvim",
     config = function()
@@ -275,19 +233,18 @@ local plugins = {
   },
   {
     "windwp/nvim-autopairs",
-    version = "*",
+    branch = "master",
     event = "InsertEnter",
     config = require("plugins.autopairs").setup,
   },
-  {
-    "tpope/vim-sleuth", -- Detect tabstop and shiftwidth automatically
-    version = "*",
-  },
+  -- {
+  --   "tpope/vim-sleuth", -- Detect tabstop and shiftwidth automatically
+  --   version = "*",
+  -- },
 
   {
     "echasnovski/mini.ai",
-
-    version = "*",
+    branch = "main",
     event = "VeryLazy",
     config = require("plugins.miniai").setup,
   },
@@ -312,8 +269,8 @@ local plugins = {
   {
     "andymass/vim-matchup",
     event = { "BufReadPost" },
-    version = "*",
-    setup = function()
+    branch = "master",
+    config = function()
       vim.o.matchpairs = "(:),{:},[:]"
       vim.g.matchup_matchparen_offscreen = { method = "popup" }
     end,
@@ -321,7 +278,7 @@ local plugins = {
 
   {
     "kylechui/nvim-surround",
-    version = "*",
+    branch = "main",
     config = require("plugins.surround").setup,
   },
 
@@ -359,25 +316,13 @@ local plugins = {
   },
   {
     "akinsho/bufferline.nvim",
-    -- version = "*",
+    branch = "main",
+    version = "*",
     dependencies = {
       "nvim-tree/nvim-web-devicons",
     },
     config = require("plugins.bufferline").setup,
   },
-
-  -- {
-  --     "shortcuts/no-neck-pain.nvim",
-  --     version = "*",
-  --     config = require("plugins.no-neck-pain").setup,
-  -- },
-
-  -- {
-  --     "folke/zen-mode.nvim",
-  --     version = "*",
-  --     config = require("plugins.zen-mode").setup,
-  -- },
-
   {
     "folke/persistence.nvim",
     event = "BufReadPre",
@@ -402,20 +347,27 @@ local plugins = {
   -- treesitter
   {
     "nvim-treesitter/nvim-treesitter",
-    version = "*",
     event = "BufEnter",
     config = require("plugins.treesitter").setup,
     build = ":TSUpdate",
+    lazy = false,
+    priority = 999,
+    cmd = { "TSUpdateSync" },
+    dependencies = {
+      "windwp/nvim-ts-autotag",
+      "tpope/vim-endwise",
+      "nvim-treesitter/nvim-treesitter-textobjects",
+    },
   },
 
   {
     "nvim-treesitter/nvim-treesitter-textobjects",
-    version = "*",
+    branch = "master",
     event = "BufEnter",
   },
   {
     "pejrich/nvim-treesitter-context",
-    -- version = "*",
+    branch = "master",
     opts = {
       -- max_lines = 5,
       filter = function(line, ext)
@@ -430,28 +382,28 @@ local plugins = {
     },
   },
 
-  {
-    "nkrkv/nvim-treesitter-rescript",
-    version = "*",
-  },
-
   -- lsp
   {
     "williamboman/mason.nvim",
-    version = "*",
+    branch = "main",
   },
   {
     "RRethy/nvim-treesitter-endwise",
+    branch = "master",
   },
   {
     "windwp/nvim-ts-autotag",
+    branch = "main",
     dependencies = "nvim-treesitter/nvim-treesitter",
     config = function()
       require("nvim-ts-autotag").setup({
-        enable = true,
-        enable_rename = true,
-        enable_close = true,
-        filetypes = { "html", "xml", "heex", "elixir" },
+        opts = {
+          -- Defaults
+          enable_close = true, -- Auto close tags
+          enable_rename = true, -- Auto rename pairs of tags
+          enable_close_on_slash = false, -- Auto close on trailing </
+        },
+        filetypes = { "html", "xml", "eruby", "heex", "elixir", "embedded_template" },
       })
     end,
     lazy = true,
@@ -460,7 +412,7 @@ local plugins = {
 
   {
     "williamboman/mason-lspconfig.nvim",
-    version = "*",
+    branch = "main",
     dependencies = {
       -- Automatically install LSPs and related tools to stdpath for neovim
       "williamboman/mason.nvim",
@@ -628,7 +580,6 @@ local plugins = {
             },
           },
         },
-        elixirls = {},
       }
 
       -- Ensure the servers and tools above are installed
@@ -644,7 +595,6 @@ local plugins = {
       local ensure_installed = vim.tbl_keys(servers or {})
       vim.list_extend(ensure_installed, {
         "stylua", -- Used to format lua code
-        "elixirls",
       })
       require("mason-tool-installer").setup({ ensure_installed = ensure_installed })
 
@@ -676,16 +626,24 @@ local plugins = {
 
   {
     "yamatsum/nvim-cursorline",
-    version = "*",
+    branch = "main",
     config = require("plugins.cursorline").setup,
   },
   {
+    "folke/lsp-colors.nvim",
+    config = function()
+      require("lsp-colors").setup({})
+    end,
+  },
+  {
+
     "gbprod/yanky.nvim",
-    version = "*",
+    branch = "main",
     config = require("plugins.yanky").setup,
     keys = {
+      { "y", "<Plug>(YankyYank)", mode = { "n", "x" } },
       {
-        "<C-p>",
+        "<M-p>",
         function()
           if require("yanky").can_cycle() == true then
             require("yanky").cycle(1)
@@ -712,7 +670,7 @@ local plugins = {
   },
   {
     "glepnir/lspsaga.nvim",
-    -- branch = "main", -- TODO: Go back to stable after the current version is released
+    branch = "main", -- TODO: Go back to stable after the current version is released
     event = "BufEnter",
     config = require("plugins.lsp.lspsaga").setup,
   },
@@ -742,11 +700,15 @@ local plugins = {
     "folke/neodev.nvim",
     version = "*",
   },
+  {
+    "tpope/vim-fugitive",
+    version = "*",
+  },
 
   -- autocompletions
   {
     "hrsh7th/nvim-cmp",
-    version = "*",
+    branch = "main",
     event = "InsertEnter",
     dependencies = {
       "hrsh7th/cmp-nvim-lsp",
@@ -788,7 +750,7 @@ local plugins = {
   -- fuzzy finders
   {
     "nvim-telescope/telescope.nvim",
-    branch = "0.1.x",
+    branch = "master",
     dependencies = {
       "nvim-lua/plenary.nvim",
       { -- If encountering errors, see telescope-fzf-native README for install instructions
@@ -811,7 +773,7 @@ local plugins = {
 
   {
     "nvim-telescope/telescope-file-browser.nvim",
-    version = "*",
+    branch = "master",
   },
 
   -- window management
@@ -826,6 +788,15 @@ local plugins = {
     "rebelot/kanagawa.nvim",
     version = "*",
     config = function()
+      require("kanagawa").setup({
+        overrides = function(colors)
+          return {
+
+            Visual = { bg = "#E69039", fg = "#223249" },
+            -- Visual = { bg = colors.palette.autumnYellow, fg = colors.palette.winterBlue },
+          }
+        end,
+      })
       vim.opt.termguicolors = true
       vim.cmd("colorscheme kanagawa")
     end,
@@ -834,7 +805,7 @@ local plugins = {
   -- tab & status bar
   {
     "nvim-lualine/lualine.nvim",
-    version = "*",
+    branch = "master",
     event = "VimEnter",
     dependencies = { "nvim-tree/nvim-web-devicons" },
     config = require("plugins.lualine").setup,
@@ -902,7 +873,7 @@ local plugins = {
   -- search/replace
   {
     "nvim-pack/nvim-spectre",
-    version = "*",
+    branch = "master",
     config = require("plugins.spectre").setup,
   },
 
@@ -940,6 +911,37 @@ local plugins = {
     version = "*",
     event = "User ThemeApplied",
     config = require("plugins.tabs-vs-spaces").setup,
+  },
+  {
+    "chrisbra/csv.vim",
+  },
+  {
+    "AndrewRadev/switch.vim",
+    config = function()
+      vim.g.switch_mapping = "-"
+      vim.g.switch_custom_definitions = { { "assert", "refute" }, { "and", "or" } }
+    end,
+  },
+  {
+    dir = "~/Documents/programming/nvim_plugins/space.nvim",
+    config = function()
+      vim.cmd([[
+        omap <silent> <Space> <Plug>(inner_space)
+        xmap <silent> <Space> <Plug>(inner_space)
+      ]])
+    end,
+  },
+  {
+    "rafcamlet/nvim-luapad",
+    config = function()
+      require("luapad").setup({})
+    end,
+  },
+  {
+    "vhyrro/luarocks.nvim",
+    priority = 1000, -- Very high priority is required, luarocks.nvim should run as the first plugin in your config.
+    config = true,
+    rocks = { "luafilesystem", "penlight" },
   },
 }
 

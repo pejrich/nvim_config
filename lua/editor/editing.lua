@@ -2,6 +2,12 @@ local M = {}
 local m = {}
 
 function M.keymaps()
+  vim.api.nvim_create_augroup("tsv_no_expandtab", { clear = true })
+  vim.api.nvim_create_autocmd({ "BufEnter" }, {
+    group = "tsv_no_expandtab",
+    pattern = "*.tsv",
+    command = "setlocal noet ci pi sts=0 sw=2 ts=2",
+  })
   vim.cmd([==[
   nnoremap @ <cmd>set lazyredraw <bar> execute "noautocmd norm! " . v:count1 . "@" . getcharstr() <bar> set nolazyredraw<cr>
   xnoremap @ :<C-U>set lazyredraw <bar> execute "noautocmd '<,'>norm! " . v:count1 . "@" . getcharstr()<bar> set nolazyredraw<cr>

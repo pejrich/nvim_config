@@ -55,6 +55,7 @@ function M.setup()
         args = editor.replace.args,
       },
     },
+    is_insert_mode = true,
   })
 end
 

@@ -1,11 +1,45 @@
 local M = {}
 local m = {}
 
+--- Throttles a function on the leading edge. Automatically `schedule_wrap()`s.
+---
+--@param fn (function) Function to throttle
+--@param timeout (number) Timeout in ms
+--@returns (function, timer) throttled function and timer. Remember to call
+---`timer:close()` at the end or you will leak memory!
+local function throttle_leading(fn, ms)
+  local timer = vim.loop.new_timer()
+  local running = false
+  -- local cached_timer = vim.loop.new_timer()
+  local cached = nil
+
+  local function wrapped_fn()
+    if cached == nil or running == false then
+      running = true
+      cached = fn()
+      -- print("cached" .. (cached or "nil"))
+      -- cached_timer:start(1000, 0, function()
+      --   cached = nil
+      -- end)
+      timer:start(ms, 0, function()
+        running = false
+      end)
+      return cached
+    else
+      return cached
+    end
+  end
+  return wrapped_fn
+end
 function M.setup()
   local lualine = require("lualine")
 
   local linemode = require("lualine.utils.mode")
   local theme = require("kanagawa.colors").setup().theme
+
+  local throttled_command_status = throttle_leading(require("noice").api.status.command.get, 100)
+  local throttled_mode_status = throttle_leading(require("noice").api.status.mode.get, 100)
+  local throttled_search_status = throttle_leading(require("noice").api.status.search.get, 100)
   -- Color table for highlights
   local colors = {
     bg = theme.ui.bg_dim,
@@ -87,31 +121,37 @@ function M.setup()
     color = { fg = colors.blue }, -- Sets highlighting of component
     padding = { left = 0, right = 1 }, -- We don't need space before this
   })
-
   ins_left({
     -- mode component
     function()
-      return "" .. " " .. linemode.get_mode()
-      -- local m = linemode.get_mode()
-      -- if m == "NORMAL" then
-      --   return "N"
-      -- elseif m == "VISUAL" then
-      --   return "V"
-      -- elseif m == "SELECT" then
-      --   return "S"
-      -- elseif m == "INSERT" then
-      --   return "I"
-      -- elseif m == "REPLACE" then
-      --   return "R"
-      -- elseif m == "COMMAND" then
-      --   return "C"
-      -- elseif m == "EX" then
-      --   return "X"
-      -- elseif m == "TERMINAL" then
-      --   return "T"
-      -- else
-      --   return m
-      -- end
+      local m = linemode.get_mode()
+      local name = nil
+      if m == "NORMAL" then
+        name = " NORMAL   "
+      elseif m == "O-PENDING" then
+        name = " O-PENDING"
+      elseif m == "VISUAL" then
+        name = " VISUAL   "
+      elseif m == "SELECT" then
+        name = " SELECT   "
+      elseif m == "INSERT" then
+        name = " INSERT   "
+      elseif m == "REPLACE" then
+        name = " REPLACE  "
+      elseif m == "COMMAND" then
+        name = " COMMAND  "
+      elseif m == "EX" then
+        name = "   EX     "
+      elseif m == "TERMINAL" then
+        name = " TERMINAL "
+      elseif m == "V-LINE" then
+        name = " V-LINE   "
+      elseif m == "V-BLOCK" then
+        name = " V-BLOCK  "
+      else
+        name = " " .. m .. string.rep(" ", 9 - m:len())
+      end
+      return "" .. name
     end,
     color = function()
       -- auto change color according to neovims mode
@@ -145,14 +185,14 @@ function M.setup()
   ins_left({
     -- filesize component
     "filesize",
-    cond = conditions.buffer_not_empty,
+    -- cond = conditions.buffer_not_empty,
     color = { fg = colors.fg },
   })
 
   ins_left({
     "filename",
     path = 1,
-    cond = conditions.buffer_not_empty,
+    -- cond = conditions.buffer_not_empty,
     color = { fg = colors.violet, gui = "bold" },
   })
 
@@ -165,9 +205,9 @@ function M.setup()
     sources = { "nvim_diagnostic" },
     symbols = { error = " ", warn = " ", info = " " },
     diagnostics_color = {
-      color_error = { fg = colors.red },
-      color_warn = { fg = colors.yellow },
-      color_info = { fg = colors.cyan },
+      error = { fg = colors.red },
+      warn = { fg = colors.yellow },
+      info = { fg = colors.cyan },
     },
   })
 
@@ -201,18 +241,25 @@ function M.setup()
   })
 
   ins_right({
-    require("noice").api.status.command.get,
-    cond = require("noice").api.status.command.has,
+    throttled_command_status,
+    cond = function()
+      return throttled_command_status() ~= nil
+    end,
     color = { fg = colors.orange },
   })
   ins_right({
-    require("noice").api.status.mode.get,
-    cond = require("noice").api.status.mode.has,
+    throttled_mode_status,
+    cond = function()
+      return throttled_mode_status() ~= nil
+    end,
     color = { fg = colors.orange },
   })
   ins_right({
-    require("noice").api.status.search.get,
-    cond = require("noice").api.status.search.has,
+
+    throttled_search_status,
+    cond = function()
+      return throttled_search_status() ~= nil
+    end,
     color = { fg = colors.orange },
   })
 
@@ -220,8 +267,17 @@ function M.setup()
   ins_right({
     "o:encoding", -- option component same as &encoding in viml
     fmt = string.upper, -- I'm not sure why it's upper case either ;)
-    cond = conditions.hide_in_width,
+    -- cond = conditions.hide_in_width,
     color = { fg = colors.green, gui = "bold" },
+  })
+
+  ins_right({
+    function()
+      return "0x%04B"
+    end,
+    fmt = string.upper, -- I'm not sure why it's upper case either ;)
+    -- cond = conditions.hide_in_width,
+    color = { fg = colors.violet },
   })
 
   ins_right({
@@ -246,7 +302,7 @@ function M.setup()
       modified = { fg = colors.orange },
       removed = { fg = colors.red },
     },
-    cond = conditions.hide_in_width,
+    -- cond = conditions.hide_in_width,
   })
 
   ins_right({

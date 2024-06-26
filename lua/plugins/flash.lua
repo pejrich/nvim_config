@@ -6,6 +6,9 @@ function M.setup()
       search = {
         enabled = false,
       },
+      char = {
+        enabled = false,
+      },
     },
     jump = {
       autojump = false,

@@ -12,19 +12,8 @@ function M.setup()
     ensure_installed = {
       "bashls",
       "cssls",
-      "dockerls",
-      "docker_compose_language_service",
-      -- "elixirls",
       "html",
-      "jsonls",
       "lua_ls",
-      "marksman",
-      "nil_ls", -- nix
-      -- "ocamllsp", -- FIXME: Ocaml LSP is broken
-      "reason_ls",
-      "rescriptls",
-      "sqlls",
-      -- "tailwindcss",
       "emmet_language_server",
       "tsserver",
       "yamlls",

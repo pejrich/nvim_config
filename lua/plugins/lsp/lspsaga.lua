@@ -80,9 +80,9 @@ end
 function M.keymaps()
   K.merge_wk({
     l = {
-      d = { "<Cmd>Lspsaga goto_definition<CR>", "Jump to [D]efinition" },
+      -- d = { "<Cmd>Lspsaga goto_definition<CR>", "Jump to [D]efinition" },
       a = { "<Cmd>Lspsaga code_action<CR>", "Code [A]ctions" },
-      f = { "<Cmd>Lspsaga finder<CR>", "[F]inder" },
+      -- f = { "<Cmd>Lspsaga finder<CR>", "[F]inder" },
     },
   })
 end

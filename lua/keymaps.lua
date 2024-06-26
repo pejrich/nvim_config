@@ -1,12 +1,55 @@
--- Core
-vim.cmd([==[
-for chars in [["(", ","], [",", ")"]]
-	execute "xnoremap i" . chars[0] . chars[1] . " :<C-u>execute 'normal! ' . v:count1 . 'T" . chars[0] . "v' . (v:count1 + (v:count1 - 1)) . 't" . chars[1] . "'<CR>"
-	execute "onoremap i" . chars[0] . chars[1] . " :normal vi" . chars[0] . chars[1] . "<CR>"
-	execute "xnoremap a" . chars[0] . chars[1] . " :<C-u>execute 'normal! ' . v:count1 . 'F" . chars[0] . "v' . (v:count1 + (v:count1 - 1)) . 'f" . chars[1] . "'<CR>"
-	execute "onoremap a" . chars[0] . chars[1] . " :normal va" . chars[0] . chars[1] . "<CR>"
-endfor
-]==])
+-- Return to same cursor position after canceling visual selection with <esc>
+vim.cmd([[
+  execute "nnoremap v m`v"
+  execute "nnoremap V m`V"
+  execute "nnoremap <C-v> m`<C-v>"
+  execute "vnoremap <esc> <esc>``"
+  execute "vnoremap <cr> <esc>"
+]])
+local dmmns = vim.api.nvim_create_namespace("dontmoveme")
+local function dont_move_me(fn)
+  local cursor = vim.api.nvim_win_get_cursor(0)
+  local ext = vim.api.nvim_buf_set_extmark(0, dmmns, cursor[1] - 1, cursor[2], {})
+  fn()
+  local extcursor = vim.api.nvim_buf_get_extmark_by_id(0, dmmns, ext, {})
+  vim.api.nvim_win_set_cursor(0, { extcursor[1] + 1, extcursor[2] })
+  vim.api.nvim_buf_clear_namespace(0, dmmns, 0, -1)
+end
+-- one     twwtwwo        three
+-- ycdv in/around the current line
+vim.cmd([[
+  nnoremap <silent> yil :<c-u>normal! m`^y$``<cr>
+  nnoremap <silent> yal :<c-u>normal! m`0y$``<cr>
+  nnoremap <silent> val :<c-u>normal! 0v$<cr>
+  nnoremap <silent> vil :<c-u>normal! ^v$<cr>
+  nnoremap <silent> dil :<c-u>normal! ^D<cr>
+  nnoremap <silent> dal :<c-u>normal! 0D<cr>
+  nnoremap <silent> cil :<c-u>normal! ^D<cr>a
+  nnoremap <silent> cal :<c-u>normal! 0D<cr>a
+]])
+vim.cmd([[
+  onoremap <silent> il :<c-u>normal! $v^<cr>
+]])
+-- dai - Delete around inside
+vim.keymap.set("n", "dai", function()
+  dont_move_me(function()
+    vim.cmd("norm f da F da ")
+  end)
+end)
+vim.keymap.set("n", "dii", function()
+  dont_move_me(function()
+    vim.cmd("norm f di F F di ")
+  end)
+end)
+
+vim.keymap.set("n", "dna", function()
+  require("editor.functions").remove_function_arg(vim.v.count)
+end)
+
+vim.keymap.set("n", "vv", function()
+  vim.fn.feedkeys("m`")
+  require("nvim-treesitter.incremental_selection").init_selection()
+end)
 
 require("editor.editing").keymaps()
 -- require("editor.buffers").keymaps()
@@ -74,7 +117,7 @@ end
 local wk = require("which-key")
 K.merge_wk({
   e = {
-    name = "[E]lixr",
+    name = "[E]lixir",
     e = {
       function()
         elixir_picker(require("telescope.themes").get_dropdown({}))
@@ -85,6 +128,13 @@ K.merge_wk({
     m = {
       '<cmd>lua require("elixir-extras").module_complete()<cr>',
       "[E]lixir Complete [M]odule",
+    },
+  },
+  d = {
+    f = {
+      name = "[F]ormat",
+      j = { "<cmd>%!jq<cr>", "[J]SON" },
+      e = { "<cmd>!mix format %:p<cr>", "[E]lixir" },
     },
   },
   g = {
@@ -112,8 +162,9 @@ K.merge_wk({
       t = { "<cmd>s/ *$//g<cr>", "[T]railing", mode = "v" },
     },
   },
-  ["!"] = {
+  ["<leader>"] = {
     name = "Misc",
+    x = { "<cmd>w<cr><cmd>source %<cr>", "E[x]ec file" },
     p = {
       name = "[P]rofile",
       f = { F.start_flame_profile, "Start [P]rofile [F]lame" },
@@ -125,13 +176,6 @@ K.merge_wk({
       c = { F.copy_file_path, "[C]opy [F]ile Path" },
       ["dd"] = { F.delete_file_path, "[DD]elete Current [F]ile" },
     },
-  },
-  b = {
-    name = "[B]uffer",
-    s = { "<cmd>BufferLinePick<cr>", "[B]uffer [S]elect" },
-    c = { "<cmd>BufferLinePickClose<cr>", "[B]uffer Select to [C]lose" },
-    n = { "<cmd>BufferLineCycleNext<cr>", "[B]uffer [N]ext" },
-    p = { "<cmd>BufferLineCyclePrev<cr>", "[B]uffer [P]rev" },
   },
   q = { "<cmd>bp<bar>sp<bar>bn<bar>bd<CR>", "[Q]uit buffer" },
   ["1"] = { "<cmd>BufferLineGoToBuffer 1<cr>", "[B]uffer [1]" },
@@ -154,46 +198,14 @@ K.merge_wk({
     p = { "<cmd>ScratchPreview<CR>", "[P]review" },
     s = { "<cmd>Scratch<CR>", "[S]cratch" },
   },
-  c = {
-    j = {
-      function()
-        local int = math.max(vim.v.count, 1)
-        vim.cmd("m .+" .. int .. "<CR>==")
-        vim.cmd("norm! " .. vim.v.count .. "k")
-      end,
-      "[C]huck Up",
-    },
-    k = {
-      function()
-        local int = (-1 * math.max(vim.v.count, 1)) - 1
-        vim.cmd("m ." .. int .. "<CR>==")
-        vim.cmd("norm! " .. vim.v.count .. "j")
-      end,
-      "[C]huck Down",
-    },
-    K = {
-      function()
-        local int = math.max(vim.v.count, 1)
-        vim.cmd("norm! " .. vim.v.count .. "k")
-        vim.cmd("m .+" .. int .. "<CR>==")
-        -- vim.cmd("norm! " .. vim.v.count .. "k")
-        -- vim.cmd("m ." .. int .. "<CR>==")
-        -- vim.cmd("norm! " .. vim.v.count .. "j")
-      end,
-      "Grap Up",
-    },
-    J = {
-      function()
-        local int = (-1 * math.max(vim.v.count, 1)) - 1
-        vim.cmd("norm! " .. vim.v.count .. "j")
-        vim.cmd("m ." .. int .. "<CR>==")
-        -- vim.cmd("norm! " .. vim.v.count .. "k")
-      end,
-      "Grab Down",
-    },
-  },
-  -- vim.api.nvim_set_keymap('n', '<leader>q', ':bp<bar>sp<bar>bn<bar>bd<CR>', { desc = 'Close buffer' })
 })
+vim.keymap.set("n", "<M-Del>", function()
+  vim.cmd("Noice dismiss")
+end)
+
+vim.keymap.set("n", "<M-BS>", function()
+  vim.cmd("Noice dismiss")
+end)
 
 wk.register({
   ["<C-s>"] = { require("substitute").operator, "[S]ubstitute [O]perator", mode = { "n" } },
@@ -204,25 +216,32 @@ wk.register({
   i = { "<Plug>(scratch-selection-reuse)<CR>", "[I]nsert" },
 }, { prefix = "<leader>", mode = { "x" } })
 
---      vim.keymap.set("n", "s", require('substitute').operator, { noremap = true })
--- vim.keymap.set("n", "ss", require('substitute').line, { noremap = true })
--- vim.keymap.set("n", "S", require('substitute').eol, { noremap = true })
--- vim.keymap.set("x", "s", require('substitute').visual, { noremap = true })
 wk.register(WK, { prefix = "<leader>" })
 wk.register(WKN, {})
-vim.api.nvim_set_keymap("n", "<A-p>", "<cmd>FzfLua files<cr>", { desc = "Find Files" })
+vim.api.nvim_set_keymap("n", "<C-p>", "<cmd>FzfLua files<cr>", { desc = "Find Files" })
 vim.api.nvim_set_keymap("n", "U", "<C-r><CR>", { desc = "Redo" })
-vim.api.nvim_set_keymap("n", "<A-j>", "<cmd>m .+1<CR>==", { desc = "Move line down" })
-vim.api.nvim_set_keymap("n", "<A-k>", "<cmd>m .-2<CR>==", { desc = "Move line up" })
-vim.api.nvim_set_keymap("i", "<A-j>", "<Esc><cmd>m .+1<CR>==gi", { desc = "Move line down" })
-vim.api.nvim_set_keymap("i", "<A-k>", "<Esc><cmd>m .-2<CR>==gi", { desc = "Move line up" })
+vim.api.nvim_set_keymap("n", "<M-j>", "<cmd>m .+1<CR>==", { desc = "Move line down" })
+vim.api.nvim_set_keymap("n", "<M-k>", "<cmd>m .-2<CR>==", { desc = "Move line up" })
+vim.api.nvim_set_keymap("i", "<M-j>", "<Esc><cmd>m .+1<CR>==gi", { desc = "Move line down" })
+vim.api.nvim_set_keymap("i", "<M-k>", "<Esc><cmd>m .-2<CR>==gi", { desc = "Move line up" })
+vim.api.nvim_set_keymap("v", "<M-j>", "<Esc><cmd>m '>+1<CR>gv=gv", { desc = "Move line up" })
+vim.api.nvim_set_keymap("v", "<M-k>", "<Esc><cmd>m '<-2<CR>gv=gv", { desc = "Move line up" })
 vim.api.nvim_set_keymap("i", "<esc>", "<C-[>", { desc = "Escape" })
 
-vim.cmd([[
-nnoremap <A-j> :m .+1<CR>==
-nnoremap <A-k> :m .-2<CR>==
-inoremap <A-j> <Esc>:m .+1<CR>==gi
-inoremap <A-k> <Esc>:m .-2<CR>==gi
-vnoremap <A-j> :m '>+1<CR>gv=gv
-vnoremap <A-k> :m '<-2<CR>gv=gv
-]])
+-- Diagnostic keymaps
+vim.keymap.set("n", "[d", vim.diagnostic.goto_prev, { desc = "Go to previous [D]iagnostic message" })
+vim.keymap.set("n", "]d", vim.diagnostic.goto_next, { desc = "Go to next [D]iagnostic message" })
+vim.keymap.set("n", "<leader>e", vim.diagnostic.open_float, { desc = "Show diagnostic [E]rror messages" })
+vim.keymap.set("n", "<C-h>", "<C-w><C-h>", { desc = "Move focus to the left window" })
+vim.keymap.set("n", "<C-l>", "<C-w><C-l>", { desc = "Move focus to the right window" })
+vim.keymap.set("n", "<C-j>", "<C-w><C-j>", { desc = "Move focus to the lower window" })
+vim.keymap.set("n", "<C-k>", "<C-w><C-k>", { desc = "Move focus to the upper window" })
+
+-- vim.cmd([[
+-- nnoremap <M-j> :m .+1<CR>==
+-- nnoremap <M-k> :m .-2<CR>==
+-- inoremap <M-j> <Esc>:m .+1<CR>==gi
+-- inoremap <M-k> <Esc>:m .-2<CR>==gi
+-- vnoremap <M-j> :m '>+1<CR>gv=gv
+-- vnoremap <M-k> :m '<-2<CR>gv=gv
+-- ]])

@@ -11,12 +11,32 @@ function M.setup()
     side_padding = 0,
   })
 
+  local max_buffer_size = 1024 * 1024 -- 1 Megabyte max
+
+  local buffer_source = {
+    name = "buffer",
+    option = {
+      get_bufnrs = function()
+        local buf = vim.api.nvim_get_current_buf()
+        local byte_size = vim.api.nvim_buf_get_offset(buf, vim.api.nvim_buf_line_count(buf))
+        if byte_size > max_buffer_size then
+          return {}
+        end
+        return { buf }
+      end,
+      indexing_interval = 1000,
+    },
+  }
   plugin.setup({
     sorting = {
       priority_weight = 2,
       comparators = {
         function(a, b)
-          return (a.kind == "luasnip" and b.kind ~= "luasnip")
+          if a.completion_item.detail == "Emmet Abbreviation" and a.completion_item.documentation == "<div>|</div>" then
+            return true
+          else
+            return (a.kind == "luasnip" and b.kind ~= "luasnip")
+          end
         end,
         compare.offset,
         compare.exact,
@@ -30,14 +50,31 @@ function M.setup()
         compare.order,
       },
     },
-    sources = {
-      { name = "luasnip" },
-      { name = "nvim_lsp" },
-      { name = "nvim_lua" },
-      { name = "buffer" },
-      { name = "path" },
-      { name = "crates" },
-    },
+    sources = plugin.config.sources(
+      vim.tbl_filter(function(component)
+        return component ~= nil
+      end, {
+        { name = "luasnip", priority_weight = 120 },
+        { name = "path", priority_weight = 110 },
+        { name = "nvim_lsp", max_view_entries = 20, priority_weight = 100 },
+        { name = "nvim_lsp_signature_help", priority_weight = 100 },
+        { name = "nvim_lua", priority_weight = 90 },
+        { name = "treesitter", priority_weight = 70 },
+      }),
+      {
+        vim.tbl_deep_extend("force", buffer_source, {
+          keyword_length = 5,
+          max_view_entries = 5,
+          option = {
+            keyword_length = 5,
+          },
+          priority_weight = 70,
+        }),
+      }
+    ),
+    -- experimental = {
+    --   native_menu = false,
+    -- },
     snippet = {
       expand = function(args)
         require("luasnip").lsp_expand(args.body)
@@ -55,6 +92,13 @@ function M.setup()
     window = {
       completion = bordered_window,
       documentation = bordered_window,
+    },
+    performance = {
+      throttle = 150,
+      debounce = 150,
+    },
+    experimental = {
+      ghost_text = true,
     },
     formatting = {
       fields = { "kind", "abbr", "menu" },

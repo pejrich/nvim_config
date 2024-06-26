@@ -83,6 +83,16 @@ function M.setup()
     button.opts.hl_shortcut = "AlphaShortcut"
   end
 
+  section.commands = {
+    type = "text",
+
+    opts = {
+      hl = "Type",
+      position = "center",
+    },
+    val = require("notes_and_tips").commands(),
+  }
+
   section.footer = {
     type = "text",
     val = "",
@@ -93,13 +103,15 @@ function M.setup()
   }
 
   M.dashboard.config.layout = {
-    section.padding(12),
+    section.padding(3),
     section.header,
-    section.padding(2),
+    section.padding(1),
     section.project,
-    section.padding(1),
+    section.padding(2),
     section.buttons,
-    section.padding(1),
+    section.padding(2),
+    section.commands,
+    section.padding(2),
     section.footer,
   }
 

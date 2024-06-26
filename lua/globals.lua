@@ -5,7 +5,10 @@ _G.K = {}
 _G.WK = {}
 -- Which key non <leader> prefixed
 _G.WKN = {}
-
+_G.P = function(v)
+  print(vim.inspect(v))
+  return v
+end
 _G.F = {
   start_flame_profile = function()
     require("plenary.profile").start("profile.log", { flame = true })
@@ -48,7 +51,7 @@ local function tableMerge(t1, t2)
         tableMerge(t1[k] or {}, t2[k] or {})
       else
         if t1[k] then
-          print("Adding " .. tostring(k) .. " as " .. tostring(dump(v)) .. " was " .. tostring(dump(t1[k])))
+          print("AAdding " .. tostring(k) .. " as " .. tostring(dump(v)) .. " was " .. tostring(dump(t1[k])))
         end
         t1[k] = v
       end

@@ -15,7 +15,7 @@ function M.setup()
       visual = "S",
       visual_line = "gS",
     },
-    move_cursor = false,
+    move_cursor = "sticky",
     aliases = {
       ["a"] = false,
     },
@@ -23,6 +23,14 @@ function M.setup()
       duration = 0,
     },
     surrounds = {
+      ["e"] = {
+        add = { "<%= ", " %>" },
+        find = "<%%= .- %%>",
+        delete = "^(<%%= )().-( %%>)()$",
+        change = {
+          target = "^(<%%= )().-( %%>)()$",
+        },
+      },
       ["p"] = {
         add = { "IO.inspect(", ")" },
         find = "IO%.inspect%b()",
@@ -30,6 +38,14 @@ function M.setup()
         change = {
           target = "^(IO%.inspect%()().-(%))()$",
         },
+      },
+      ["("] = {
+
+        add = { "(", ")" },
+        find = function()
+          return require("nvim-surround.config").get_selection({ motion = "a)" })
+        end,
+        delete = "^(.)().-(.)()$",
       },
       ["c"] = {
         add = function()
