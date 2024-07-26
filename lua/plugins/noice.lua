@@ -5,6 +5,9 @@ function M.setup()
   local plugin = require("noice")
 
   plugin.setup({
+    messages = {
+      view = "mini",
+    },
     cmdline = {
       format = {
         search_down = { view = "cmdline" },
@@ -64,7 +67,7 @@ function M.setup()
         },
         border = {
           style = "rounded",
-          padding = { 0, 1 },
+          -- padding = { 0, 1 },
         },
         win_options = {
           winhighlight = {

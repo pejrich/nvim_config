@@ -1,17 +1,18 @@
 local M = {}
 
 M.signs = {
-  Error = "",
-  Warn = "",
-  Hint = "",
-  Info = "",
+  [vim.diagnostic.severity.ERROR] = "",
+  [vim.diagnostic.severity.WARN] = "",
+  [vim.diagnostic.severity.HINT] = "",
+  [vim.diagnostic.severity.INFO] = "",
 }
 
 function M.setup()
   local lsp = vim.lsp
 
   local config = require("lspconfig")
-  local capabilities = vim.lsp.protocol.make_client_capabilities()
+  local capabilities =
+    vim.tbl_deep_extend("force", vim.lsp.protocol.make_client_capabilities(), require("cmp_nvim_lsp").default_capabilities())
   local mason = require("plugins.lsp.mason")
   local lua = require("plugins.lsp.servers.lua")
   local rust = require("plugins.lsp.servers.rust")
@@ -96,21 +97,27 @@ function M.setup()
   --     ["mixEnv"] = "dev",
   --   },
   -- })
+  local sign_table = { text = {}, linehl = {}, numhl = {} }
   for type, icon in pairs(M.signs) do
     local hl = "DiagnosticSign" .. type
-    vim.fn.sign_define(hl, { text = icon, texthl = hl, numhl = hl })
+    sign_table.text[type] = icon
+    sign_table.linehl[type] = hl
+    sign_table.numhl[type] = hl
   end
+  vim.diagnostic.config({
+    signs = sign_table,
+  })
 
   lsp.handlers["textDocument/hover"] = lsp.with(lsp.handlers.hover, { border = "rounded" })
 
   mason.setup()
 
-  lua.setup(config)
-  rust.setup()
-  typescript.setup(config)
+  lua.setup(config, capabilities)
+  rust.setup(config, capabilities)
+  typescript.setup(config, capabilities)
   -- json.setup(config)
-  yaml.setup(config)
-  elixir.setup(config)
+  yaml.setup(config, capabilities)
+  elixir.setup(config, capabilities)
   -- tailwind.setup(config)
 
   config.emmet_language_server.setup({

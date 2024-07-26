@@ -5,10 +5,27 @@ _G.K = {}
 _G.WK = {}
 -- Which key non <leader> prefixed
 _G.WKN = {}
-_G.P = function(v)
-  print(vim.inspect(v))
-  return v
+_G.P = function(...)
+  local args = {}
+  for _, arg in ipairs({ ... }) do
+    table.insert(args, vim.inspect(arg))
+  end
+  print(unpack(args))
+  return ...
 end
+-- _G.P = function(v)
+--   print(vim.inspect(v))
+--   return v
+-- end
+_G.Clip = {
+  c = function(data)
+    vim.fn.setreg("+", data)
+    return data
+  end,
+  p = function()
+    return vim.fn.getreg("+")
+  end,
+}
 _G.F = {
   start_flame_profile = function()
     require("plenary.profile").start("profile.log", { flame = true })
@@ -91,17 +108,10 @@ end
 function K.mapseq(mapping)
   local wk = require("which-key")
 
-  local keymap = {}
-
   -- NB!: it is important to remove items in reverse order to avoid shifting
   local cmd = table.remove(mapping, 3)
   local desc = table.remove(mapping, 2)
   local key = table.remove(mapping, 1)
 
-  mapping[1] = cmd
-  mapping[2] = desc
-
-  keymap[key] = mapping
-
-  wk.register(keymap, default_keymap_options)
+  wk.add({ { key, cmd, desc = desc, remap = false, silent = true } })
 end

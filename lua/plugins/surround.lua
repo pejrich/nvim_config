@@ -3,17 +3,17 @@ local M = {}
 function M.setup()
   require("nvim-surround").setup({
     keymaps = {
-      normal = "sa",
-      normal_cur = "ss",
       normal_line = "sA",
       normal_cur_line = "sAA",
       delete = "sd",
+      normal_cur = "ss",
       change = "sc",
       change_line = "sC",
       insert = "<C-g>s",
       insert_line = "<C-g>S",
       visual = "S",
       visual_line = "gS",
+      normal = "sa",
     },
     move_cursor = "sticky",
     aliases = {
@@ -23,12 +23,20 @@ function M.setup()
       duration = 0,
     },
     surrounds = {
-      ["e"] = {
+      ["E"] = {
         add = { "<%= ", " %>" },
         find = "<%%= .- %%>",
         delete = "^(<%%= )().-( %%>)()$",
         change = {
           target = "^(<%%= )().-( %%>)()$",
+        },
+      },
+      ["e"] = {
+        add = { "#{", "}" },
+        find = "#{.-}",
+        delete = "^(#{)().-(})()$",
+        change = {
+          target = "^(#{)().-(})()$",
         },
       },
       ["p"] = {
@@ -46,6 +54,29 @@ function M.setup()
           return require("nvim-surround.config").get_selection({ motion = "a)" })
         end,
         delete = "^(.)().-(.)()$",
+      },
+      ["#"] = {
+        add = { "#{", "}" },
+        find = "#{.-}",
+        delete = "^(#{)().-(})()$",
+        change = {
+          target = "^(#{)().-(})()$",
+        },
+      },
+      ["{"] = {
+        add = { "{", "}" },
+        find = function()
+          return M.get_selection({ motion = "a{" })
+        end,
+        delete = "^(.)().-(.)()$",
+      },
+      ["["] = {
+
+        add = { "[", "]" },
+        find = function()
+          return require("nvim-surround.config").get_selection({ motion = "a]" })
+        end,
+        delete = "^[.]().-(.)()$",
       },
       ["c"] = {
         add = function()

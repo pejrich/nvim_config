@@ -1,22 +1,23 @@
 local M = {}
 
-function M.setup(config)
-    local neodev = require "neodev"
+function M.setup(config, capabilities)
+  local neodev = require("neodev")
 
-    neodev.setup {}
+  neodev.setup({})
 
-    config.lua_ls.setup {
-        settings = {
-            Lua = {
-                format = {
-                    enable = true,
-                },
-                telemetry = {
-                    enable = false,
-                },
-            },
+  config.lua_ls.setup({
+    capabilities = capabilities,
+    settings = {
+      Lua = {
+        format = {
+          enable = true,
         },
-    }
+        telemetry = {
+          enable = false,
+        },
+      },
+    },
+  })
 end
 
 return M

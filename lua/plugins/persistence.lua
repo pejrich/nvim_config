@@ -39,12 +39,9 @@ function M.setup()
 end
 
 function M.keymaps()
-  K.merge_wk({ ["<leader>"] = {
-    r = {
-      m.restore_session,
-      "[R]estore Prev Session",
-    },
-  } })
+  require("which-key").add({
+    { "<leader><leader>r", m.restore_session, desc = "[R]estore Prev Session" },
+  })
 end
 
 -- Private

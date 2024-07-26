@@ -60,13 +60,8 @@ function M.setup()
 end
 
 function M.keymaps()
-  K.merge_wk({
-    f = {
-      p = {
-        m.open_project_search,
-        "[P]roject",
-      },
-    },
+  require("which-key").add({
+    { "<leader>fp", m.open_project_search, desc = "[P]roject" },
   })
   -- K.mapseq { "<Leader>sp", "Open search in project", m.open_project_search, mode = "n" }
   -- K.mapseq { "<Leader>sc", "Open search in current buffer", m.open_current_buffer_search, mode = "n" }

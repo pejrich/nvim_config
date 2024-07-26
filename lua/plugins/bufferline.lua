@@ -4,7 +4,12 @@ function M.setup()
   vim.opt.termguicolors = true
   local colors = require("kanagawa.colors").setup()
   local theme_colors = colors.theme
-  vim.api.nvim_set_hl(0, "MyHarpoonSelected", { fg = theme_colors.syn.preproc })
+
+  vim.api.nvim_create_autocmd({ "ColorScheme" }, {
+    callback = function()
+      vim.api.nvim_set_hl(0, "MyHarpoonSelected", { fg = theme_colors.syn.preproc })
+    end,
+  })
   require("bufferline").setup({
     highlights = {
       fill = {

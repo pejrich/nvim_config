@@ -13,15 +13,16 @@ function M.setup()
       update_register_on_cycle = true,
     },
     system_clipboard = {
-      sync_with_ring = true,
+      sync_with_ring = false,
     },
     highlight = {
       on_yank = false,
-      timer = 250,
+      on_put = false,
+      -- timer = 50,
     },
-    preserve_cursor_position = {
-      enabled = true,
-    },
+    -- preserve_cursor_position = {
+    --   enabled = true,
+    -- },
     -- textobj = {
     --   enabled = true,
     -- },

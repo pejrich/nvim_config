@@ -1,13 +1,29 @@
 local M = {}
 
-function M.setup(config)
-  local capabilities = vim.lsp.protocol.make_client_capabilities()
+function M.setup(config, capabilities)
   capabilities.textDocument.completion.completionItem.snippetSupport = true
   config.elixirls.setup({
+    server = {
+      capabilities = capabilities,
+    },
+    default_config = {
+      filetypes = { "elixir", "heex", "eex", "eelixir" },
+      capabilities = capabilities,
+      cmd = { "elixir-ls" },
+      settings = { elixirLS = { dialyzerEnabled = false, fetchDeps = false, mixEnv = "dev", excludeModules = { "Liter.Convert*" } } },
+      init_options = {
+        mixEnv = "dev",
+        elixirLS = { dialyzerEnabled = false, fetchDeps = false, mixEnv = "dev", excludeModules = { "Liter.Convert*" } },
+      },
+    },
     filetypes = { "elixir", "heex", "eex", "eelixir" },
     capabilities = capabilities,
     cmd = { "elixir-ls" },
-    settings = { elixirLS = { dialyzerEnabled = false, fetchDeps = false, mixEnv = "dev" } },
+    settings = { elixirLS = { dialyzerEnabled = false, fetchDeps = false, mixEnv = "dev", excludeModules = { "Liter.Convert*" } } },
+    init_options = {
+      mixEnv = "dev",
+      elixirLS = { dialyzerEnabled = false, fetchDeps = false, mixEnv = "dev", excludeModules = { "Liter.Convert*" } },
+    },
   })
   -- config.elixirls.setup({
   --   capabilities = capabilities,

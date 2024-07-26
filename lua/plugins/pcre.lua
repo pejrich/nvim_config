@@ -32,9 +32,12 @@ end
 local function perform_sub(string, sub_exp)
   print("Perform sub")
   print(vim.inspect(sub_exp))
-  local args = { "nvim_pcre", vim.fn.shellescape(table.concat(string, "\n")), sub_exp }
-  local handle = io.popen(table.concat(args, " "))
+  local args = { "echo", "-e", '"' .. table.concat(string, "\n") .. '', "|", "perl", "-pe", vim.fn.shellescape(sub_exp) }
+  P(table.concat(args, " "))
+  -- local args = { "nvim_pcre", vim.fn.shellescape(table.concat(string, "\n")), sub_exp }
+  local handle = io.popen(table.concat(args, " "), "r")
   local new_lines = handle:read("*a")
+  P(new_lines)
   handle:close()
   return split(new_lines, "\n")
 end
@@ -43,10 +46,10 @@ local function perl_sub(opts)
   local line1 = opts.line1
   local line2 = opts.line2
   local buf = vim.api.nvim_get_current_buf()
-  local lines = vim.api.nvim_buf_get_lines(buf, line1 - 1, line2, 0)
+  local lines = vim.api.nvim_buf_get_lines(buf, line1 - 1, line2, false)
   local sub_exp = parse_sub_exp(opts.args)
   local new_lines = perform_sub(lines, sub_exp)
-  vim.api.nvim_buf_set_lines(buf, line1 - 1, line2, 0, new_lines)
+  vim.api.nvim_buf_set_lines(buf, line1 - 1, line2, false, new_lines)
 
   -- local args = { table.concat(lines, "\n"), sub_exp }
   -- local curl = require("plenary.curl")

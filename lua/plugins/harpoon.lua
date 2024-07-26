@@ -55,73 +55,79 @@ function M.keymaps()
     require("harpoon"):list():select(4)
   end, { desc = "Harpoon 4" })
 
-  K.merge_wk({
-    h = {
-      name = "[H]arpoon",
-      a = {
-        function()
-          harpoon:list():add()
-        end,
-        "[A]dd",
-      },
-      l = {
-        function()
-          toggle_telescope(require("harpoon"):list())
-        end,
-        "[L]ist",
-      },
-      d = {
-        name = "[D]elete",
-        ["1"] = {
-          function()
-            harpoon:list():remove_at(1)
-          end,
-          "Mark [1]",
-        },
-        ["2"] = {
-          function()
-            harpoon:list():remove_at(2)
-          end,
-          "Mark [2]",
-        },
-        ["3"] = {
-          function()
-            harpoon:list():remove_at(3)
-          end,
-          "Mark [3]",
-        },
-        ["4"] = {
-          function()
-            harpoon:list():remove_at(4)
-          end,
-          "Mark [4]",
-        },
-        ["5"] = {
-          function()
-            harpoon:list():remove_at(5)
-          end,
-          "Mark [5]",
-        },
-        ["6"] = {
-          function()
-            harpoon:list():remove_at(6)
-          end,
-          "Mark [6]",
-        },
-      },
+  require("which-key").add({
+    { "<leader>h", group = "[H]arpoon" },
+    {
+      "<leader>ha",
+      function()
+        harpoon:list():add()
+      end,
+      desc = "[A]dd",
+    },
+    {
+      "<leader>hl",
+      function()
+        toggle_telescope(require("harpoon"):list())
+      end,
+      desc = "[L]ist",
+    },
+    { "<leader>hd", group = "[D]elete" },
+    {
+      "<leader>hd1",
+      function()
+        harpoon:list():remove_at(1)
+      end,
+      desc = "Mark [1]",
+    },
+    {
+      "<leader>hd2",
+      function()
+        harpoon:list():remove_at(2)
+      end,
+      desc = "Mark [2]",
+    },
+    {
+      "<leader>hd3",
+      function()
+        harpoon:list():remove_at(3)
+      end,
+      desc = "Mark [3]",
+    },
+    {
+      "<leader>hd4",
+      function()
+        harpoon:list():remove_at(4)
+      end,
+      desc = "Mark [4]",
+    },
+    {
+      "<leader>hd5",
+      function()
+        harpoon:list():remove_at(5)
+      end,
+      desc = "Mark [5]",
+    },
+    {
+      "<leader>hd6",
+      function()
+        harpoon:list():remove_at(6)
+      end,
+      desc = "Mark [6]",
     },
 
-    ["{"] = {
+    {
+      "<leader>{",
       function()
         harpoon:list():prev()
       end,
-      "Prev Harpoon",
+      desc = "Prev Harpoon",
     },
-    ["}"] = {
+    {
+      "<leader>}",
       function()
         harpoon:list():next()
       end,
-      "Next Harpoon",
+      desc = "Next Harpoon",
     },
   })
 end

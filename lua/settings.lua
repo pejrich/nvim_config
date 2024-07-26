@@ -1,12 +1,11 @@
 local g = vim.g
 local opt = vim.opt
 -- replace default search with search by regex
-vim.api.nvim_set_keymap("n", "/", "/\\v", { noremap = true })
-vim.api.nvim_set_keymap("v", "/", "/\\v", { noremap = true })
+vim.keymap.set({ "n", "v" }, "/", "/\\v", { noremap = true })
 -- copy file path to `unnamedplus` clipboard
 
 -- vim.cmd("!echo -n %:p | pbcopy")
-vim.api.nvim_set_keymap("n", "cp", [[:let @+ = expand("%:p")<CR>]], { noremap = true, desc = "Copy file path to `unnamedplus` clipboard" })
+vim.keymap.set({ "n" }, "cp", [[:let @+ = expand("%:p")<CR>]], { noremap = true, desc = "Copy file path to `unnamedplus` clipboard" })
 -- command-mode completion
 vim.api.wildmenu = true
 -- Wildmenu ignores case
@@ -44,7 +43,7 @@ opt.showmode = false
 -- Sync clipboard between OS and Neovim.
 --  Remove this option if you want your OS clipboard to remain independent.
 --  See `:help 'clipboard'`
-opt.clipboard = "unnamedplus"
+opt.clipboard = "unnamed"
 
 -- Enable break indent
 opt.breakindent = true
@@ -115,7 +114,7 @@ opt.termguicolors = true
 
 opt.number = true
 
-opt.clipboard = "unnamedplus"
+-- opt.clipboard = "unnamedplus"
 opt.completeopt = "menu,menuone,noselect"
 
 opt.list = true
@@ -139,9 +138,17 @@ opt.whichwrap:append({
   l = true,
 })
 
-opt.autoread = true
-opt.autowrite = true
-opt.autowriteall = true
+-- Allow the cursor to go one past the EOL. This is equivalent to regular cursor behavior `endofline|`.
+-- Vim default only allows a cursor to go as far as `endoflin|e`
+opt.virtualedit = "onemore"
+-- This stops ESC commands. For example quickly hitting <ESC>j in insert will instead of going down 1 line, trigger whatever is on
+-- <C-j>(move line down)
+opt.ttimeoutlen = 5
+-- Confirm if closing unsaved buffer
+opt.confirm = true
+-- opt.autoread = true
+-- opt.autowrite = true
+-- opt.autowriteall = true
 
 -- opt.sessionoptions = "blank,buffers,curdir,folds,help,tabpages,winsize,winpos,terminal,localoptions"
 

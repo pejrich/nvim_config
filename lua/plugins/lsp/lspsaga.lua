@@ -78,12 +78,10 @@ function M.setup()
 end
 
 function M.keymaps()
-  K.merge_wk({
-    l = {
-      -- d = { "<Cmd>Lspsaga goto_definition<CR>", "Jump to [D]efinition" },
-      a = { "<Cmd>Lspsaga code_action<CR>", "Code [A]ctions" },
-      -- f = { "<Cmd>Lspsaga finder<CR>", "[F]inder" },
-    },
+  require("which-key").add({
+    { "<leader>ld", "<Cmd>Lspsaga goto_definition<CR>", desc = "Jump to [D]efinition" },
+    { "<leader>la", "<Cmd>Lspsaga code_action<CR>", desc = "Code [A]ctions" },
+    { "<leader>ls", "<Cmd>Lspsaga finder<CR>", desc = "[F]inder" },
   })
 end
 

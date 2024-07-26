@@ -1,7 +1,8 @@
 local M = {}
 
-function M.setup(config)
+function M.setup(config, capabilities)
   config.tsserver.setup({
+    capabilities = capabilities,
     on_attach = function(client)
       -- Formatting is handled by conform/prettier
       client.server_capabilities.documentFormattingProvider = false

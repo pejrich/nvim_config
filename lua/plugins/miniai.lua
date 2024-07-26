@@ -1,10 +1,18 @@
 local M = {}
-
 function M.setup()
   local ai = require("mini.ai")
   ai.setup({
     n_lines = 50000,
+    mappings = {
+      around_next = "aN",
+      inside_next = "iN",
+      around_last = "aL",
+      inside_last = "iL",
+    },
     custom_textobjects = {
+      e = { "#{().-()}" },
+      E = { "<%%= ().-() %%>" },
+      l = { "^()%s+().-()()\n" },
       o = ai.gen_spec.treesitter({
         a = { "@block.outer", "@conditional.outer", "@loop.outer" },
         i = { "@block.inner", "@conditional.inner", "@loop.inner" },
@@ -47,15 +55,27 @@ function M.setup()
 
   local ic = vim.deepcopy(i)
   local ac = vim.deepcopy(a)
-  for key, name in pairs({ n = "Next", l = "Last" }) do
-    i[key] = vim.tbl_extend("force", { name = "Inside " .. name .. " textobject" }, ic)
-    a[key] = vim.tbl_extend("force", { name = "Around " .. name .. " textobject" }, ac)
+  local i2 = {}
+  local a2 = {}
+  for k, v in pairs(i) do
+    table.insert(i2, { "i" .. k, group = v, mode = { "o", "x" } })
   end
-  require("which-key").register({
-    mode = { "o", "x" },
-    i = i,
-    a = a,
-  })
+
+  for k, v in pairs(a) do
+    table.insert(a2, { "a" .. k, group = v, mode = { "o", "x" } })
+  end
+  for key, name in pairs({ n = "Next", l = "Last" }) do
+    for k, v in pairs(ic) do
+      table.insert(i2, { "i" .. key .. k, group = "Inside " .. name .. " textobject", mode = { "o", "x" } })
+    end
+    for k, v in pairs(ac) do
+      table.insert(a2, { "a" .. key .. k, group = "Around " .. name .. " textobject", mode = { "o", "x" } })
+    end
+    -- i[key] = vim.tbl_extend("force", { name = "Inside " .. name .. " textobject" }, ic)
+    -- a[key] = vim.tbl_extend("force", { name = "Around " .. name .. " textobject" }, ac)
+  end
+  require("which-key").add({ a2 })
+  require("which-key").add({ i2 })
 end
 
 return M

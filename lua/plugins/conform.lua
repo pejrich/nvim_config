@@ -2,79 +2,79 @@ local M = {}
 local m = {}
 
 function M.setup()
-    local plugin = require "conform"
+  local plugin = require("conform")
 
-    local prettier = { { "prettierd", "prettier" } }
+  local prettier = { { "prettierd", "prettier" } }
 
-    plugin.setup({
-        formatters_by_ft = {
-            javascript = prettier,
-            javascriptreact = prettier,
-            typescript = prettier,
-            typescriptreact = prettier,
-            json = nil, -- handled by jsonls
-            yaml = { "yamlfmt" },
-            nix = { "alejandra" },
-            lua = { "stylua" },
-        },
-        notify_on_error = false,
-        format_on_save = {
-            timeout_ms = 500,
-            lsp_fallback = true,
-        },
-
-    })
+  plugin.setup({
+    formatters_by_ft = {
+      javascript = prettier,
+      javascriptreact = prettier,
+      typescript = prettier,
+      typescriptreact = prettier,
+      json = nil, -- handled by jsonls
+      yaml = { "yamlfmt" },
+      nix = { "alejandra" },
+      lua = { "stylua" },
+    },
+    notify_on_error = false,
+    format_after_save = {
+      async = true,
+      timeout_ms = 2500,
+      lsp_fallback = true,
+    },
+  })
 end
 
 function M.keymaps()
-    K.map { "<M-f>", "Format current buffer", M.format, mode = { "n", "v", "i" } }
+  K.map({ "<M-f>", "Format current buffer", M.format, mode = { "n", "v", "i" } })
 end
 
 function M.format()
-    m.trim()
+  m.trim()
 
-    local formatted = require("conform").format()
+  local formatted = require("conform").format({ async = true, lsp_fallback = true })
 
-    if not formatted then
-        m.try_lsp_format()
-    end
+  if not formatted then
+    m.try_lsp_format()
+  end
 end
 
 -- Private
 
 function m.trim()
-    local trailspace = require "mini.trailspace"
+  local trailspace = require("mini.trailspace")
 
-    trailspace.trim()
-    trailspace.trim_last_lines()
-    vim.api.nvim_buf_set_lines(0, 0, vim.fn.nextnonblank(1) - 1, true, {})
+  trailspace.trim()
+  trailspace.trim_last_lines()
+  vim.api.nvim_buf_set_lines(0, 0, vim.fn.nextnonblank(1) - 1, true, {})
 end
 
 function m.try_lsp_format()
-    local filetype = vim.bo.filetype
+  local filetype = vim.bo.filetype
 
-    local clients = vim.lsp.get_clients()
+  local clients = vim.lsp.get_clients()
 
-    local client
+  local client
 
-    for _, c in ipairs(clients) do
-        if c.config ~= nil and c.config.filetypes ~= nil then
-            for _, ft in ipairs(c.config.filetypes) do
-                if ft == filetype and c.server_capabilities.documentFormattingProvider then
-                    client = c
-                    break
-                end
-            end
+  for _, c in ipairs(clients) do
+    if c.config ~= nil and c.config.filetypes ~= nil then
+      for _, ft in ipairs(c.config.filetypes) do
+        if ft == filetype and c.server_capabilities.documentFormattingProvider then
+          client = c
+          break
         end
-
-        if client then
-            break
-        end
+      end
     end
 
     if client then
-        vim.lsp.buf.format()
+      break
     end
+  end
+
+  if client then
+    vim.lsp.buf.format()
+  end
 end
 
 return M

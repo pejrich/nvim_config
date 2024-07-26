@@ -23,9 +23,15 @@ local plugins = {
   -- stdlib
   {
     "nvim-lua/plenary.nvim",
-    version = "*",
   },
 
+  {
+    dir = "~/Documents/programming/nvim_plugins/scratch_pad.nvim",
+    lazy = false,
+    config = function()
+      require("scratch_pad").setup({})
+    end,
+  },
   {
     dir = "~/Documents/programming/nvim_plugins/mrs_doubtfire.nvim",
     config = function()
@@ -41,7 +47,7 @@ local plugins = {
   {
     dir = "~/Documents/programming/nvim_plugins/chuck_and_grab.nvim",
     config = function()
-      require("chuck_and_grab").setup({})
+      require("chuck_and_grab").setup()
     end,
   },
 
@@ -70,7 +76,6 @@ local plugins = {
   -- keymaps
   {
     "folke/which-key.nvim",
-    version = "*",
     config = require("plugins.which-key").setup,
   },
 
@@ -85,7 +90,6 @@ local plugins = {
   -- essentials
   {
     "echasnovski/mini.trailspace",
-    version = "*",
     event = "BufEnter",
     config = require("plugins.mini-trailspace").setup,
   },
@@ -96,9 +100,27 @@ local plugins = {
     end,
   },
   {
-    "danilamihailov/beacon.nvim",
+    -- "danilamihailov/beacon.nvim",
+    "rainbowhxch/beacon.nvim",
     config = function()
       vim.cmd("let g:beacon_size = 15")
+      require("beacon").setup({
+        enable = true,
+        size = 15,
+        fade = true,
+        minimal_jump = 10,
+        show_jumps = true,
+        focus_gained = false,
+        shrink = true,
+        timeout = 500,
+        ignore_buffers = {},
+        ignore_filetypes = {},
+      })
+      vim.api.nvim_create_autocmd({ "ColorScheme" }, {
+        callback = function()
+          vim.api.nvim_set_hl(0, "Beacon", { link = "BeaconDefault" })
+        end,
+      })
     end,
   },
   {
@@ -109,8 +131,8 @@ local plugins = {
         on_substitute = require("yanky.integration").substitute(),
       })
 
-      K.merge_wk_normal({
-        P = { require("substitute").operator, "[S]ubstitue [O]perator", mode = { "n" } },
+      require("which-key").add({
+        { "P", require("substitute").operator, desc = "[S]ubstitue [O]perator" },
       })
     end,
   },
@@ -121,6 +143,12 @@ local plugins = {
     branch = "main",
     event = "VeryLazy",
     config = require("plugins.flash").setup,
+  },
+  {
+    "NMAC427/guess-indent.nvim",
+    config = function()
+      require("guess-indent").setup({})
+    end,
   },
 
   -- {
@@ -145,6 +173,11 @@ local plugins = {
           file_icons = true, -- show file icons?
           color_icons = true, -- colorize file|git icons
           sort_lastused = true,
+        },
+        winopts = {
+          preview = {
+            delay = 350,
+          },
         },
       })
     end,
@@ -195,7 +228,12 @@ local plugins = {
   {
     "mg979/vim-visual-multi",
     branch = "master",
-    config = function() end,
+    config = function()
+      vim.g.VM_show_warnings = 0
+      -- vim.g.VM_maps = {
+      --   ["I BS"] = "", -- disable backspace mapping
+      -- }
+    end,
     lazy = false,
   },
   {
@@ -221,10 +259,10 @@ local plugins = {
       })
     end,
   },
-  -- {
-  --   "vidocqh/auto-indent.nvim",
-  --   opts = {},
-  -- },
+  {
+    "vidocqh/auto-indent.nvim",
+    opts = {},
+  },
   {
     "emmanueltouzery/elixir-extras.nvim",
     config = function()
@@ -237,10 +275,10 @@ local plugins = {
     event = "InsertEnter",
     config = require("plugins.autopairs").setup,
   },
-  -- {
-  --   "tpope/vim-sleuth", -- Detect tabstop and shiftwidth automatically
-  --   version = "*",
-  -- },
+  {
+    "tpope/vim-sleuth", -- Detect tabstop and shiftwidth automatically
+    version = "*",
+  },
 
   {
     "echasnovski/mini.ai",
@@ -248,18 +286,18 @@ local plugins = {
     event = "VeryLazy",
     config = require("plugins.miniai").setup,
   },
-  { -- Collection of various small independent plugins/modules
-    "echasnovski/mini.nvim",
-    config = function()
-      -- Better Around/Inside textobjects
-      --
-      -- Examples:
-      --  - va)  - [V]isually select [A]round [)]parenthen
-      --  - yinq - [Y]ank [I]nside [N]ext [']quote
-      --  - ci'  - [C]hange [I]nside [']quote
-      require("mini.ai").setup({ n_lines = 50000 })
-    end,
-  },
+  -- { -- Collection of various small independent plugins/modules
+  --   "echasnovski/mini.nvim",
+  --   config = function()
+  --     -- Better Around/Inside textobjects
+  --     --
+  --     -- Examples:
+  --     --  - va)  - [V]isually select [A]round [)]parenthen
+  --     --  - yinq - [Y]ank [I]nside [N]ext [']quote
+  --     --  - ci'  - [C]hange [I]nside [']quote
+  --     -- require("mini.ai").setup({ n_lines = 50000 })
+  --   end,
+  -- },
   {
     "ThePrimeagen/harpoon",
     branch = "harpoon2",
@@ -268,7 +306,6 @@ local plugins = {
   },
   {
     "andymass/vim-matchup",
-    event = { "BufReadPost" },
     branch = "master",
     config = function()
       vim.o.matchpairs = "(:),{:},[:]"
@@ -292,24 +329,20 @@ local plugins = {
   },
   {
     "nvim-tree/nvim-web-devicons",
-    version = "*",
     config = require("plugins.devicons").setup,
   },
   {
     "sitiom/nvim-numbertoggle",
-    version = "*",
     config = function() end,
   },
   { "MunifTanjim/nui.nvim", lazy = true },
   { "nvim-neotest/nvim-nio" },
   {
     "karb94/neoscroll.nvim",
-    version = "*",
     config = require("plugins.neoscroll").setup,
   },
   {
     "smjonas/live-command.nvim",
-    version = "*",
     config = require("plugins.pcre").setup,
     -- live-command supports semantic versioning via tags
     -- tag = "1.*",
@@ -317,7 +350,6 @@ local plugins = {
   {
     "akinsho/bufferline.nvim",
     branch = "main",
-    version = "*",
     dependencies = {
       "nvim-tree/nvim-web-devicons",
     },
@@ -378,6 +410,9 @@ local plugins = {
         }
         local pattern = patterns[ext]
         return not pattern or line:find(pattern) == nil
+      end,
+      on_attach = function(buf)
+        return vim.fn.wordcount().bytes < 1000000
       end,
     },
   },
@@ -653,12 +688,13 @@ local plugins = {
         end,
       },
       {
-        "<C-S-p>",
+        "<M-S-p>",
         function()
           require("yanky").cycle(-1)
         end,
       },
       { "p", "<Plug>(YankyPutAfter)", mode = { "n", "x" } },
+      { "PP", "<Plug>(YankyPutBefore)", mode = { "n", "x" } },
 
       {
         "<A-r>",
@@ -684,25 +720,20 @@ local plugins = {
 
   {
     "mfussenegger/nvim-lint",
-    version = "*",
     event = "BufEnter",
     config = require("plugins.lint").setup,
   },
-
   {
     "stevearc/conform.nvim",
-    version = "*",
     event = "BufEnter",
     config = require("plugins.conform").setup,
   },
 
   {
     "folke/neodev.nvim",
-    version = "*",
   },
   {
     "tpope/vim-fugitive",
-    version = "*",
   },
 
   -- autocompletions
@@ -724,7 +755,6 @@ local plugins = {
 
   {
     "L3MON4D3/LuaSnip",
-    version = "*",
     event = "InsertEnter",
     config = require("plugins.luasnip").setup,
   },
@@ -779,14 +809,12 @@ local plugins = {
   -- window management
   {
     "sindrets/winshift.nvim",
-    version = "*",
     event = "VimEnter",
     config = require("plugins.winshift").setup,
   },
 
   {
     "rebelot/kanagawa.nvim",
-    version = "*",
     config = function()
       require("kanagawa").setup({
         overrides = function(colors)
@@ -814,14 +842,12 @@ local plugins = {
   -- terminal
   {
     "akinsho/toggleterm.nvim",
-    version = "*",
     config = require("plugins.toggleterm").setup,
   },
 
   -- git
   {
     "kdheepak/lazygit.nvim",
-    version = "*",
   },
 
   -- {
@@ -858,7 +884,6 @@ local plugins = {
 
   {
     "sindrets/diffview.nvim",
-    version = "*",
     dependencies = { "nvim-lua/plenary.nvim" },
     config = require("plugins.git.diffview").setup,
   },
@@ -880,14 +905,12 @@ local plugins = {
   -- comments
   {
     "numToStr/Comment.nvim",
-    version = "*",
     event = "BufEnter",
     config = require("plugins.comment").setup,
   },
 
   {
     "folke/todo-comments.nvim",
-    version = "*",
     event = "BufEnter",
     dependencies = { "nvim-lua/plenary.nvim" },
     config = require("plugins.todo-comments").setup,
@@ -896,19 +919,16 @@ local plugins = {
   -- markdown
   {
     "iamcco/markdown-preview.nvim",
-    version = "*",
     build = require("plugins.markdown-preview").setup,
   },
 
   {
     "mzlogin/vim-markdown-toc",
-    version = "*",
   },
 
   -- misc
   {
     "tenxsoydev/tabs-vs-spaces.nvim",
-    version = "*",
     event = "User ThemeApplied",
     config = require("plugins.tabs-vs-spaces").setup,
   },
@@ -925,10 +945,10 @@ local plugins = {
   {
     dir = "~/Documents/programming/nvim_plugins/space.nvim",
     config = function()
-      vim.cmd([[
-        omap <silent> <Space> <Plug>(inner_space)
-        xmap <silent> <Space> <Plug>(inner_space)
-      ]])
+      -- vim.cmd([[
+      --   omap <silent> <Space> <Plug>(inner_space)
+      --   xmap <silent> <Space> <Plug>(inner_space)
+      -- ]])
     end,
   },
   {
@@ -937,18 +957,147 @@ local plugins = {
       require("luapad").setup({})
     end,
   },
+  -- {
+  --   "vhyrro/luarocks.nvim",
+  --   priority = 1000, -- Very high priority is required, luarocks.nvim should run as the first plugin in your config.
+  --   config = true,
+  --   rocks = { "luafilesystem", "penlight" },
+  -- },
+
   {
-    "vhyrro/luarocks.nvim",
-    priority = 1000, -- Very high priority is required, luarocks.nvim should run as the first plugin in your config.
-    config = true,
-    rocks = { "luafilesystem", "penlight" },
+    "editorconfig/editorconfig-vim",
+  },
+  {
+    "rmagatti/goto-preview",
+    event = "BufEnter",
+    config = function()
+      require("goto-preview").setup({
+        width = 120, -- Width of the floating window
+        height = 15, -- Height of the floating window
+        border = { "↖", "─", "┐", "│", "┘", "─", "└", "│" }, -- Border characters of the floating window
+        default_mappings = true, -- Bind default mappings
+        debug = false, -- Print debug information
+        opacity = nil, -- 0-100 opacity level of the floating window where 100 is fully transparent.
+        resizing_mappings = false, -- Binds arrow keys to resizing the floating window.
+        post_open_hook = nil, -- A function taking two arguments, a buffer and a window to be ran as a hook.
+        post_close_hook = nil, -- A function taking two arguments, a buffer and a window to be ran as a hook.
+        references = { -- Configure the telescope UI for slowing the references cycling window.
+          telescope = require("telescope.themes").get_dropdown({ hide_preview = false }),
+        },
+        -- These two configs can also be passed down to the goto-preview definition and implementation calls for one off "peak" functionality.
+        focus_on_open = true, -- Focus the floating window when opening it.
+        dismiss_on_move = true, -- Dismiss the floating window when moving the cursor.
+        force_close = true, -- passed into vim.api.nvim_win_close's second argument. See :h nvim_win_close
+        bufhidden = "wipe", -- the bufhidden option to set on the floating window. See :h bufhidden
+        stack_floating_preview_windows = true, -- Whether to nest floating windows
+        preview_window_title = { enable = true, position = "left" }, -- Whether to set the preview window title as the filename
+        zindex = 1, -- Starting zindex for the stack of floating windows
+      })
+    end,
+  },
+  {
+    "chrisgrieser/nvim-various-textobjs",
+    lazy = false,
+    config = function()
+      require("various-textobjs").setup({
+        useDefaultKeymaps = true,
+        disabledKeymaps = {
+          "aq",
+          "iq",
+          "io",
+          "ao",
+          "gG",
+          "iz",
+          "az",
+          "gw",
+          "il",
+          "al",
+          "ie",
+          "ae",
+          "iC",
+          "aC",
+          "iD",
+          "aD",
+          "iP",
+          "aP",
+          "iN",
+          "aN",
+        },
+        notifyNotFound = true,
+      })
+    end,
+  },
+  {
+    "theHamsta/nvim_rocks",
+    event = "VeryLazy",
+    build = "pip3 install --user hererocks && python3 -mhererocks . -j2.1.0-beta3 -r3.0.0 && cp nvim_rocks.lua lua",
+    config = function()
+      ---- Add here the packages you want to make sure that they are installed
+      --local nvim_rocks = require "nvim_rocks"
+      --nvim_rocks.ensure_installed "uuid
+      require("nvim_rocks").ensure_installed("luautf8")
+    end,
+  },
+  {
+    "chrisgrieser/nvim-spider",
+    lazy = true,
+    dependencies = {
+      "theHamsta/nvim_rocks",
+      build = "pip3 install --user hererocks && python3 -mhererocks . -j2.1.0-beta3 -r3.0.0 && cp nvim_rocks.lua lua",
+      config = function() end,
+    },
+    config = function()
+      require("spider").setup({
+        skipInsignificantPunctuation = true,
+        consistentOperatorPending = true, -- see "Consistent Operator-pending Mode" in the README
+        subwordMovement = true,
+        customPatterns = {}, -- check "Custom Movement Patterns" in the README for details
+      })
+    end,
+  },
+  {
+    "andrewferrier/debugprint.nvim",
+    dependencies = {
+      "echasnovski/mini.nvim", -- Needed for :ToggleCommentDebugPrints (not needed for NeoVim 0.10+)
+    },
+    config = function()
+      require("debugprint").setup({})
+    end,
+    -- The 'keys' and 'cmds' sections of this configuration are optional and only needed if
+    -- you want to take advantage of `lazy.nvim` lazy-loading. If you decide to
+    -- customize the keys/commands (see below), you'll need to change these too.
+    -- keys = {
+    --   { "g?", mode = "n" },
+    --   { "g?", mode = "x" },
+    -- },
+    -- cmd = {
+    --   "ToggleCommentDebugPrints",
+    --   "DeleteDebugPrints",
+    -- },
+  },
+  {
+    "chrisgrieser/cmp_yanky",
+  },
+  {
+    "chrisgrieser/nvim-rip-substitute",
+    cmd = "RipSubstitute",
+    keys = {
+      {
+        "<leader>fr",
+        function()
+          require("rip-substitute").sub()
+        end,
+        mode = { "n", "x" },
+        desc = " rip substitute",
+      },
+    },
   },
 }
 
 local options = {
   defaults = {
     lazy = false,
-    version = "*",
+    --   version = "*",
   },
   lockfile = "~/.config/nvim/lazy-lock.json",
 }

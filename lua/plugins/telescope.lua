@@ -3,6 +3,44 @@ local X = {}
 local m = {}
 
 function M.setup()
+  local previewers = require("telescope.previewers")
+  local Job = require("plenary.job")
+  local new_maker = function(filepath, bufnr, opts)
+    opts = opts or {}
+    -- if opts.use_ft_detect == nil then opts.use_ft_detect = true end
+    -- opts.use_ft_detect = opts.use_ft_detect == false and false or
+    --                          bad_files(filepath)
+    filepath = vim.fn.expand(filepath)
+
+    Job:new({
+      command = "file",
+      args = { "--mime-type", "-b", filepath },
+      on_exit = function(j)
+        local res = j:result()[1]
+        local mime_type = vim.split(res, "/")[1]
+        if mime_type == "text" or res == "application/json" then
+          vim.loop.fs_stat(filepath, function(_, stat)
+            if not stat then
+              return
+            end
+            if stat.size > 100000 then
+              vim.schedule(function()
+                vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, { "FILE TOO LARGE" })
+              end)
+            else
+              previewers.buffer_previewer_maker(filepath, bufnr, opts)
+            end
+          end)
+        else
+          -- maybe we want to write something to the buffer here
+          vim.schedule(function()
+            vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, { "BINARY" })
+          end)
+        end
+      end,
+    }):sync()
+  end
+
   local plugin = require("telescope")
   local actions = require("telescope.actions")
   local editor = require("editor.searchreplace")
@@ -42,7 +80,7 @@ function M.setup()
       initial_mode = "insert",
       selection_strategy = "reset",
       sorting_strategy = "ascending",
-      layout_strategy = "vertical",
+      layout_strategy = "horizontal",
       layout_config = {
         horizontal = {
           prompt_position = "top",
@@ -71,7 +109,7 @@ function M.setup()
       grep_previewer = require("telescope.previewers").vim_buffer_vimgrep.new,
       qflist_previewer = require("telescope.previewers").vim_buffer_qflist.new,
       -- Developer configurations: Not meant for general override
-      buffer_previewer_maker = require("telescope.previewers").buffer_previewer_maker,
+      buffer_previewer_maker = new_maker,
       mappings = {
         n = {
           ["<S-Down>"] = actions.file_split,
@@ -96,7 +134,11 @@ function M.setup()
         mappings = {
           n = { ["<D-BS>"] = actions.delete_buffer },
           i = { ["<D-BS>"] = actions.delete_buffer },
+          -- ignore_current_buffer = true,
         },
+        sort_mru = true,
+
+        ignore_current_buffer = true,
       },
     },
     extensions = extensions,
@@ -121,7 +163,7 @@ function M.setup()
   vim.keymap.set("n", "<leader>fw", builtin.grep_string, { desc = "[F]ind current [W]ord" })
   vim.keymap.set("n", "<leader>fg", builtin.live_grep, { desc = "[F]ind by [G]rep" })
   vim.keymap.set("n", "<leader>fd", builtin.diagnostics, { desc = "[F]ind [D]iagnostics" })
-  vim.keymap.set("n", "<leader>fr", builtin.resume, { desc = "[F]ind [R]esume" })
+  -- vim.keymap.set("n", "<leader>fr", builtin.resume, { desc = "[F]ind [R]esume" })
   vim.keymap.set("n", "<leader>f.", builtin.oldfiles, { desc = '[F]ind Recent Files ("." for repeat)' })
   vim.keymap.set("n", "<leader><leader><leader>", builtin.buffers, { desc = "[ ] Find existing buffers" })
 
@@ -234,31 +276,30 @@ function M.keymaps()
   K.map({ "<D-t>", "Open file finder", m.open_file_finder, mode = { "n", "i", "v" } })
   K.map({ "<D-f>", "Open project-wide text search", m.open_text_finder, mode = { "n", "i", "v" } })
 
-  K.merge_wk({
-    f = {
-      c = { m.open_command_finder, "Open [c]ommand finder" },
-      h = { "<cmd>Telescope help_tags<CR>", "[H]elp tags" },
+  require("which-key").add({
+    { "<leader>fc", m.open_command_finder, desc = "[C]ommand finder" },
+    { "<leader>fh", "<cmd>Telescope help_tags<CR>", desc = "[H]elp tags" },
+    { "<leader>l", group = "[L]SP" },
+    {
+      "<leader>lf",
+      function()
+        vim.lsp.buf.format({ async = true })
+      end,
+      desc = "[F]ormat",
     },
-    l = {
-      name = "[L]SP",
-      f = {
-        function()
-          vim.lsp.buf.format({ async = true })
-        end,
-        "[F]ormat",
-      },
-      d = {
-        function()
-          m.open_diagnostics({ current_buffer = true })
-        end,
-        "[D]iagnostics",
-      },
-      p = {
-        function()
-          m.open_diagnostics({ current_buffer = false })
-        end,
-        "[P]roject Diagnostics",
-      },
+    {
+      "<leader>lx",
+      function()
+        m.open_diagnostics({ current_buffer = true })
+      end,
+      desc = "[D]iagnostics",
+    },
+    {
+      "<leader>lp",
+      function()
+        m.open_diagnostics({ current_buffer = false })
+      end,
+      desc = "[P]roject Diagnostics",
     },
   })
 end

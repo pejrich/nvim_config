@@ -9,10 +9,11 @@ function M.keymaps()
     command = "setlocal noet ci pi sts=0 sw=2 ts=2",
   })
   vim.cmd([==[
-  nnoremap @ <cmd>set lazyredraw <bar> execute "noautocmd norm! " . v:count1 . "@" . getcharstr() <bar> set nolazyredraw<cr>
-  xnoremap @ :<C-U>set lazyredraw <bar> execute "noautocmd '<,'>norm! " . v:count1 . "@" . getcharstr()<bar> set nolazyredraw<cr>
-  nnoremap Q <cmd>set lazyredraw <bar> execute "noautocmd norm! Q" <bar> set nolazyredraw<cr>
-  xnoremap Q :<C-U>set lazyredraw <bar> execute "noautocmd '<,'>norm! Q" <bar> set nolazyredraw<cr>
+  " nnoremap @@@ @
+  " nnoremap @ <cmd>set lazyredraw <bar> execute "norm " . v:count1 . "@@@" . getcharstr() <bar> set nolazyredraw<cr>
+  " xnoremap @ :<C-U>set lazyredraw <bar> execute "'<,'>norm " . v:count1 . "@@@" . getcharstr()<bar> set nolazyredraw<cr>
+  " nnoremap Q <cmd>set lazyredraw <bar> execute "noautocmd norm! Q" <bar> set nolazyredraw<cr>
+  " xnoremap Q :<C-U>set lazyredraw <bar> execute "noautocmd '<,'>norm! Q" <bar> set nolazyredraw<cr>
   ]==])
   -- vim.cmd([[ nnoremap @q <cmd>noautocmd norm! @q<cr> ]])
   -- vim.cmd([[

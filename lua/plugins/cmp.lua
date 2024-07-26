@@ -11,20 +11,17 @@ function M.setup()
     side_padding = 0,
   })
 
-  local max_buffer_size = 1024 * 1024 -- 1 Megabyte max
-
   local buffer_source = {
     name = "buffer",
     option = {
       get_bufnrs = function()
         local buf = vim.api.nvim_get_current_buf()
         local byte_size = vim.api.nvim_buf_get_offset(buf, vim.api.nvim_buf_line_count(buf))
-        if byte_size > max_buffer_size then
+        if byte_size > 1024 * 1024 then -- 1 Megabyte max
           return {}
         end
         return { buf }
       end,
-      indexing_interval = 1000,
     },
   }
   plugin.setup({
@@ -60,10 +57,11 @@ function M.setup()
         { name = "nvim_lsp_signature_help", priority_weight = 100 },
         { name = "nvim_lua", priority_weight = 90 },
         { name = "treesitter", priority_weight = 70 },
+        { name = "cmp_yanky" },
       }),
       {
         vim.tbl_deep_extend("force", buffer_source, {
-          keyword_length = 5,
+          keyword_length = 3,
           max_view_entries = 5,
           option = {
             keyword_length = 5,
@@ -87,6 +85,7 @@ function M.setup()
       ["<C-c>"] = mapping.complete(),
       ["<C-y>"] = mapping.abort(),
       ["<D-w>"] = mapping.abort(),
+      ["<S-CR>"] = mapping.confirm({ select = true }), -- Accept currently selected item. Set `select` to `false` to only confirm explicitly selected items.
       ["<C-e>"] = mapping.confirm({ select = true }), -- Accept currently selected item. Set `select` to `false` to only confirm explicitly selected items.
     }),
     window = {
