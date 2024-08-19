@@ -1,12 +1,13 @@
 if vim.g.neovide then
   vim.o.guifont = "FiraCode Nerd Font:h18:#e-subpixelantialias"
 
-  vim.g.neovide_padding_top = 20 -- Set to 40 if the tabline is hidden
-  vim.g.neovide_padding_bottom = 20
+  vim.g.neovide_padding_top = 40 -- Set to 40 if the tabline is hidden
+  vim.g.neovide_padding_bottom = 0
   vim.g.neovide_padding_right = 10
   vim.g.neovide_padding_left = 10
+  vim.g.neovide_show_border = false
 
-  vim.g.neovide_scroll_animation_length = 0.2
+  vim.g.neovide_scroll_animation_length = 0.1
 
   vim.g.neovide_floating_shadow = true
 
@@ -21,7 +22,8 @@ if vim.g.neovide then
   vim.g.neovide_fullscreen = false
 
   vim.g.neovide_input_use_logo = true
-  vim.g.neovide_input_macos_alt_is_meta = true
+  -- vim.g.neovide_input_macos_alt_is_meta = true
+  vim.g.neovide_input_macos_option_key_is_meta = "both"
 
   vim.g.neovide_cursor_antialiasing = false
   vim.g.neovide_cursor_animate_in_insert_mode = false

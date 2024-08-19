@@ -1,5 +1,6 @@
 -- Keymaps
-
+local utils = require("utils")
+_G.utils = utils
 _G.K = {}
 -- Which key <leader> prefixed
 _G.WK = {}
@@ -12,6 +13,15 @@ _G.P = function(...)
   end
   print(unpack(args))
   return ...
+end
+_G.keeping_pos = function(fun)
+  local cursor = vim.api.nvim_win_get_cursor(0)
+  print("saving ")
+  P(cursor)
+  fun()
+  print("resoring")
+  P(cursor)
+  vim.api.nvim_win_set_cursor(0, cursor)
 end
 -- _G.P = function(v)
 --   print(vim.inspect(v))

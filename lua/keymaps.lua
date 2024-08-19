@@ -23,6 +23,11 @@ vim.cmd([[
   execute "vnoremap <esc> <esc>`9"
   execute "vnoremap <cr> <esc>"
 ]])
+
+vim.keymap.set("n", "vv", function()
+  vim.fn.feedkeys("m9")
+  require("nvim-treesitter.incremental_selection").init_selection()
+end)
 vim.keymap.del({ "n" }, "gcc")
 -- Change norm `C` to function like the opposite of norm `D`. C deletes to start of line, D deletes to end of line
 vim.cmd([[
@@ -37,21 +42,6 @@ local function dont_move_me(fn)
   vim.api.nvim_win_set_cursor(0, { extcursor[1] + 1, extcursor[2] })
   vim.api.nvim_buf_clear_namespace(0, dmmns, 0, -1)
 end
--- one     twwtwwo        three
--- ycdv in/around the current line
--- vim.cmd([[
---   nnoremap <silent> yil :<c-u>normal! m`^y$``<cr>
---   nnoremap <silent> yal :<c-u>normal! m`0y$``<cr>
---   nnoremap <silent> val :<c-u>normal! 0v$<cr>
---   nnoremap <silent> vil :<c-u>normal! ^v$<cr>
---   nnoremap <silent> dil :<c-u>normal! ^D<cr>
---   nnoremap <silent> dal :<c-u>normal! 0D<cr>
---   nnoremap <silent> cil :<c-u>normal! ^D<cr>a
---   nnoremap <silent> cal :<c-u>normal! 0D<cr>a
--- ]])
--- vim.cmd([[
---   onoremap <silent> il :<c-u>normal! $v^<cr>
--- ]])
 -- dai - Delete around inside
 vim.keymap.set("n", "dai", function()
   dont_move_me(function()
@@ -66,11 +56,6 @@ end)
 
 vim.keymap.set("n", "dna", function()
   require("editor.functions").remove_function_arg(vim.v.count)
-end)
-
-vim.keymap.set("n", "vv", function()
-  vim.fn.feedkeys("m`")
-  require("nvim-treesitter.incremental_selection").init_selection()
 end)
 
 require("editor.editing").keymaps()
@@ -107,6 +92,7 @@ require("plugins.git.fugit2").keymaps()
 require("plugins.git.gitsigns").keymaps()
 require("plugins.git.diffview").keymaps()
 require("plugins.nvim-spider").keymaps()
+require("plugins.barbar").keymaps()
 
 local pickers = require("telescope.pickers")
 local finders = require("telescope.finders")
@@ -175,18 +161,26 @@ wk.add({
   { l(l("f")), group = "[F]ile" },
   { l(l("fc")), F.copy_file_path, desc = "[C]opy [F]ile Path" },
   { l(l("fdd")), F.delete_file_path, desc = "[DD]elete Current [F]ile" },
-  { l("q"), "<cmd>bp<bar>sp<bar>bn<bar>bd<CR>", desc = "[Q]uit buffer" },
-  { l("1"), "<cmd>BufferLineGoToBuffer 1<cr>", desc = "[B]uffer [1]" },
-  { l("2"), "<cmd>BufferLineGoToBuffer 2<cr>", desc = "[B]uffer [2]" },
-  { l("3"), "<cmd>BufferLineGoToBuffer 3<cr>", desc = "[B]uffer [3]" },
-  { l("4"), "<cmd>BufferLineGoToBuffer 4<cr>", desc = "[B]uffer [4]" },
-  { l("5"), "<cmd>BufferLineGoToBuffer 5<cr>", desc = "[B]uffer [5]" },
-  { l("6"), "<cmd>BufferLineGoToBuffer 6<cr>", desc = "[B]uffer [6]" },
-  { l("7"), "<cmd>BufferLineGoToBuffer 7<cr>", desc = "[B]uffer [7]" },
-  { l("8"), "<cmd>BufferLineGoToBuffer 8<cr>", desc = "[B]uffer [8]" },
-  { l("9"), "<cmd>BufferLineGoToBuffer 9<cr>", desc = "[B]uffer [9]" },
-  { l("["), "<cmd>BufferLineCyclePrev<cr>", desc = "[B]uffer [P]rev" },
-  { l("]"), "<cmd>BufferLineCycleNext<cr>", desc = "[B]uffer [N]ext" },
+  { l("C"), require("quicker").toggle, desc = "Toggle quickfix" },
+  {
+    l("L"),
+    function()
+      require("quicker").toggle({ loclist = true })
+    end,
+    desc = "Toggle loclist",
+  },
+  -- { l("q"), "<cmd>bp<bar>sp<bar>bn<bar>bd<CR>", desc = "[Q]uit buffer" },
+  -- { l("1"), "<cmd>BufferLineGoToBuffer 1<cr>", desc = "[B]uffer [1]" },
+  -- { l("2"), "<cmd>BufferLineGoToBuffer 2<cr>", desc = "[B]uffer [2]" },
+  -- { l("3"), "<cmd>BufferLineGoToBuffer 3<cr>", desc = "[B]uffer [3]" },
+  -- { l("4"), "<cmd>BufferLineGoToBuffer 4<cr>", desc = "[B]uffer [4]" },
+  -- { l("5"), "<cmd>BufferLineGoToBuffer 5<cr>", desc = "[B]uffer [5]" },
+  -- { l("6"), "<cmd>BufferLineGoToBuffer 6<cr>", desc = "[B]uffer [6]" },
+  -- { l("7"), "<cmd>BufferLineGoToBuffer 7<cr>", desc = "[B]uffer [7]" },
+  -- { l("8"), "<cmd>BufferLineGoToBuffer 8<cr>", desc = "[B]uffer [8]" },
+  -- { l("9"), "<cmd>BufferLineGoToBuffer 9<cr>", desc = "[B]uffer [9]" },
+  -- { l("["), "<cmd>BufferLineCyclePrev<cr>", desc = "[B]uffer [P]rev" },
+  -- { l("]"), "<cmd>BufferLineCycleNext<cr>", desc = "[B]uffer [N]ext" },
   { l("s"), group = "[S]ubstitute/[S]cratch" },
   { l("so"), require("substitute").operator, desc = "[O]perator" },
   { l("sl"), require("substitute").line, desc = "[L]ine" },
@@ -194,6 +188,12 @@ wk.add({
   { l("si"), "<Plug>(scratch-insert-reuse)", desc = "[I]nsert" },
   { l("sp"), "<cmd>ScratchPreview<CR>", desc = "[P]review" },
   { l("ss"), "<cmd>Scratch<CR>", desc = "[S]cratch" },
+})
+wk.add({
+  { "<C-w>L", desc = "Move window to right" },
+  { "<C-w>H", desc = "Move window to left" },
+  { "<C-w>J", desc = "Move window to bottom" },
+  { "<C-w>K", desc = "Move window to top" },
 })
 
 local delim_map = { ["("] = 1, [")"] = 1, ["{"] = 1, ["}"] = 1, ["["] = 1, ["]"] = 1, ['"'] = 1, ["'"] = 1, [""] = 1 }
@@ -252,9 +252,24 @@ wk.add({
 -- wk.register(WK, { prefix = "<leader>" })
 -- wk.register(WKN, {})
 
+local fuzzy = "Telescope"
+local toggleFuzzy = function()
+  if fuzzy == "Telescope" then
+    vim.keymap.set({ "n" }, "<C-p>", "<cmd>FzfLua files<cr>", { desc = "Find Files" })
+    vim.keymap.set({ "n" }, "<D-p>", "<cmd>FzfLua files<cr>", { desc = "Find Files" })
+    fuzzy = "Fzf"
+  else
+    vim.keymap.set({ "n" }, "<C-p>", "<cmd>Telescope find_files<cr>", { desc = "Find Files" })
+    vim.keymap.set({ "n" }, "<D-p>", "<cmd>Telescope find_files<cr>", { desc = "Find Files" })
+    fuzzy = "Telescope"
+  end
+  vim.notify("Fuzzy switched to " .. fuzzy)
+end
 vim.keymap.set({ "n" }, "\\\\gv", "<Plug>(VM-Reselect-Last)<cr>", { desc = "Multicursor Reselelect Last" })
 -- vim.keymap.set({ "n" }, "<C-p>", "<cmd>FzfLua files<cr>", { desc = "Find Files" })
 vim.keymap.set({ "n" }, "<C-p>", "<cmd>Telescope find_files<cr>", { desc = "Find Files" })
+vim.keymap.set({ "n" }, "<D-p>", "<cmd>Telescope find_files<cr>", { desc = "Find Files" })
+vim.keymap.set({ "n" }, "<leader><C-p>", toggleFuzzy, { desc = "FzfLua <> Telescope" })
 vim.keymap.set({ "n" }, "<C-S-p>", "<cmd>Telescope buffers<cr>", { desc = "Buffer Select" })
 vim.keymap.set({ "n" }, "<C-f>", "<cmd>Telescope live_grep<cr>", { desc = "Live grep" })
 vim.keymap.set({ "n" }, "U", "<C-r><CR>", { desc = "Redo" })

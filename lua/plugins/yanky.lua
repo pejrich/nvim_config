@@ -49,6 +49,61 @@ function M.setup()
 end
 
 function M.keymaps()
+  require("which-key").add({
+    {
+      "y",
+      function()
+        if require("noice").api.statusline.mode.get() then
+          vim.api.nvim_feedkeys([["ay]], "n", true)
+          return [["ay]]
+        else
+          vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<Plug>(YankyYank)", true, true, true), "m", true)
+        end
+      end,
+      mode = { "n", "x" },
+      expr = true,
+      nowait = true,
+    },
+
+    {
+      "p",
+      function()
+        if require("noice").api.statusline.mode.get() then
+          vim.api.nvim_feedkeys([["ap]], "n", true)
+          return [["ap]]
+        else
+          vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<Plug>(YankyPutAfter)", true, true, true), "m", true)
+        end
+      end,
+      mode = { "n", "x" },
+      expr = true,
+      nowait = true,
+    },
+    {
+      "<M-p>",
+      function()
+        if require("yanky").can_cycle() == true then
+          require("yanky").cycle(1)
+        else
+          require("substitute").operator()
+        end
+      end,
+    },
+    {
+      "<M-S-p>",
+      function()
+        require("yanky").cycle(-1)
+      end,
+    },
+    { "PP", "<Plug>(YankyPutBefore)", mode = { "n", "x" } },
+
+    {
+      "<A-r>",
+      "<cmd>Telescope yank_history theme=cursor previewer=false<cr>",
+      desc = "[Y]ank History",
+      mode = { "i", "n", "x" },
+    },
+  })
   -- vim.keymap.set({ "n", "x" }, "p", "<Plug>(YankyPutAfter)")
   -- vim.keymap.set({ "n", "x" }, "P", "<Plug>(YankyPutBefore)")
   -- vim.keymap.set({ "n", "x" }, "gp", "<Plug>(YankyGPutAfter)")

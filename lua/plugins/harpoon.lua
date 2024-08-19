@@ -61,6 +61,7 @@ function M.keymaps()
       "<leader>ha",
       function()
         harpoon:list():add()
+        vim.cmd(":do User")
       end,
       desc = "[A]dd",
     },

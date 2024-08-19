@@ -5,6 +5,7 @@ function M.setup()
   local plugin = require("persistence")
 
   plugin.setup({
+    options = { "globals" },
     pre_save = function()
       local lazy = require("plugins.lazy")
       local noice = require("plugins.noice")
@@ -30,6 +31,7 @@ function M.setup()
       mason.ensure_hidden()
       lazygit.ensure_hidden()
       diffview.ensure_all_hidden()
+      vim.api.nvim_exec_autocmds("User", { pattern = "SessionSavePre" })
 
       -- For some reason, it breaks persistence so that the session is not saved
       -- vim.cmd "wa"

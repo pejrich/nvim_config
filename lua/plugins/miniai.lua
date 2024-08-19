@@ -1,26 +1,71 @@
 local M = {}
+local l = {}
+local next_next = function()
+  local char = vim.fn.getcharstr()
+  vim.cmd("exe 'norm vi" .. char .. "o\rllvi" .. char .. "'")
+end
 function M.setup()
+  vim.keymap.set("o", "iN", next_next)
+  vim.keymap.set("x", "iN", next_next)
   local ai = require("mini.ai")
   ai.setup({
     n_lines = 50000,
     mappings = {
-      around_next = "aN",
-      inside_next = "iN",
+      around_next = "an",
+      inside_next = "in",
       around_last = "aL",
       inside_last = "iL",
     },
     custom_textobjects = {
+      -- [K]ey = roughly anything to the left of `=` or `:`, until SOL, `{[(`, `,`
+      k = {
+        { "^%s*[^:=%s%{%[,]+%s*[:=]", "[%s%{%[,]+[^:=]-%s*[:=]", "^[^:=%[%{%(]+[:=]" },
+        { "^[%s%{%[,]-()%s*()[^:=%{%[,]-()%s*()[:=]$", "^[^:=%[%{%(]-%s?[:=]$" },
+      },
+      -- k = { "[%s%{,]+()()[^:=]-()%s*()[:=]" },
+      -- [V]alue = roughly anything to the right of `=` or `:`, up until `,`, `]})`
+      v = { { "[%s%{]+[^:=]-%s*[:=]()%s*()[^%},]-()%s*()[%},]", "[%s%{]+[^:=]-%s*[:=]()%s*()[^%},]-()%s*()$" } },
+      -- [x]ml/html attribute = `class="..."`, `data-state={...}`, etc.
+      x = { { [[%s()[%w%-]+=%b{}()%s*]], [[%s()[%w%-]+=["'].-["']()%s*]] } },
+      X = { "^[^=]*=()%s*().+()()$" },
+      -- Substring
+      S = {
+        {
+          "%W()()%w[%l%d]+()[_%- ]?()", -- camelCase or lowercase
+          "%W()()%u[%u%d]+()[_%- ]?()", -- UPPER_CASE
+          "%W()()%d+()[_%- ]?()", -- number
+
+          "^()()%w[%l%d]+()[_%- ]?()", -- camelCase or lowercase
+          "^()()%u[%u%d]+()[_%- ]?()", -- UPPER_CASE
+          "^()()%d+()[_%- ]?()", -- number
+        },
+      },
+      -- [e]lixir interpolation = #{...}
       e = { "#{().-()}" },
-      E = { "<%%= ().-() %%>" },
-      l = { "^()%s+().-()()\n" },
+      -- [E]lixir interpolation = <%= ... %>
+      -- [e]lixir is the more common interpolation. [E]lixir is the Heex only interpolation
+      E = { "<%%=? ().-() %%>" },
+      -- [T]erm = Roughly and value so `var`, `thing.attr`, `@attr`, `@some_var.some_attr`, typically delimited by ` `, `([{`, `}])`, `=`
+      T = { { "^%s*[%w%.%_%-%@]+", "[^%w%.%_%-%@]+[%w%.%_%-%@]+" }, "^[^%w%.%_%-%@]*()%s*()[%w%.%_%-%@]+()%s*()[^%w%.%_%-%@]*$" },
+      -- [l]ine charwise = similar to `yy` but without the newline, `i` excludes leading WS, `a` includes leading WS
+      l = { "^()%s*().-()()\n" },
+      -- m = { "^%%[A-Za-z0-9.]*{().-()}$" },
+      -- [m]ap/struct = `%{...}`, or `%Some.Struct{...}`
+      m = { "%%[A-Za-z0-9.]*%b{}", "^%%[A-Za-z0-9.]*{().-()}$" },
       o = ai.gen_spec.treesitter({
         a = { "@block.outer", "@conditional.outer", "@loop.outer" },
         i = { "@block.inner", "@conditional.inner", "@loop.inner" },
       }, {}),
+      ["?"] = function(...)
+        print("? CALLED")
+        local args = { ... }
+        return require("plugins.miniai.lopsided").call(args[1])
+      end,
       b = ai.gen_spec.treesitter({ a = "@function.outer", i = "@function.inner" }, {}),
-      m = ai.gen_spec.treesitter({ a = "@class.outer", i = "@class.inner" }, {}),
+      M = ai.gen_spec.treesitter({ a = "@class.outer", i = "@class.inner" }, {}),
       -- t = { '<([%p%w]-)%f[^<%w][^<>]->.-</%1>', '^<.->().*()</[^/]->$' },
       t = ai.gen_spec.treesitter({ a = "@function.outer", i = "@function.inner" }, {}),
+      ["%"] = nil,
     },
   })
   -- register all text objects with which-key
@@ -77,5 +122,4 @@ function M.setup()
   require("which-key").add({ a2 })
   require("which-key").add({ i2 })
 end
-
 return M

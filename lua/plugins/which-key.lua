@@ -7,6 +7,7 @@ function M.setup()
   -- presets.actions = {}
 
   require("which-key").setup({
+    enabled = false,
     preset = "classic",
     icons = {
       breadcrumb = "»", -- symbol used in the command line area that shows your active key combo

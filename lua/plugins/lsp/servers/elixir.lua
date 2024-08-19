@@ -1,5 +1,31 @@
 local M = {}
 
+local restarts = 0
+local last_restart = 0
+local function kill_elixirls()
+  -- vim.cmd([[!ps waxl | grep "beam.smp"]])
+  local x = vim.api.nvim_exec2([[!ps waxl | grep "beam.smp"]], { output = true }).output
+  x = vim.split(x, "\n")
+  local reload = false
+  for _, i in ipairs(x) do
+    if i:match("language_server") or i:match("elixir-ls") then
+      local pid = i:match("^ *[0-9]* *([0-9]*)")
+      vim.notify("Killing Elixir-LS", vim.log.levels.DEBUG)
+      vim.api.nvim_exec2("!kill -9 " .. pid, { output = false })
+      if (utils.unix_timestamp() - last_restart) < 30 then
+        if restarts < 3 then
+          reload = true
+          restarts = restarts + 1
+        end
+      else
+        last_restart = utils.unix_timestamp()
+        restarts = 1
+        reload = true
+      end
+    end
+  end
+  return reload
+end
 function M.setup(config, capabilities)
   capabilities.textDocument.completion.completionItem.snippetSupport = true
   config.elixirls.setup({
@@ -10,20 +36,25 @@ function M.setup(config, capabilities)
       filetypes = { "elixir", "heex", "eex", "eelixir" },
       capabilities = capabilities,
       cmd = { "elixir-ls" },
-      settings = { elixirLS = { dialyzerEnabled = false, fetchDeps = false, mixEnv = "dev", excludeModules = { "Liter.Convert*" } } },
-      init_options = {
-        mixEnv = "dev",
-        elixirLS = { dialyzerEnabled = false, fetchDeps = false, mixEnv = "dev", excludeModules = { "Liter.Convert*" } },
-      },
+      cmd_env = { MIX_ENV = "ls" },
     },
     filetypes = { "elixir", "heex", "eex", "eelixir" },
     capabilities = capabilities,
     cmd = { "elixir-ls" },
-    settings = { elixirLS = { dialyzerEnabled = false, fetchDeps = false, mixEnv = "dev", excludeModules = { "Liter.Convert*" } } },
-    init_options = {
-      mixEnv = "dev",
-      elixirLS = { dialyzerEnabled = false, fetchDeps = false, mixEnv = "dev", excludeModules = { "Liter.Convert*" } },
+    cmd_env = { MIX_ENV = "ls" },
+    settings = {
+      mixEnv = "ls",
+      elixirLS = { dialyzerEnabled = false, fetchDeps = false, mixEnv = "ls" },
     },
+    on_exit = function(code, signal)
+      vim.notify("elixir ls exit " .. code .. " signal: " .. signal)
+
+      vim.schedule(function()
+        if kill_elixirls() then
+          vim.api.nvim_exec2("LspStart elixir-ls", { output = false })
+        end
+      end)
+    end,
   })
   -- config.elixirls.setup({
   --   capabilities = capabilities,
@@ -45,7 +76,7 @@ function M.setup(config, capabilities)
   --     -- port = 9000, -- connect via TCP with the given port. mutually exclusive with `cmd`. defaults to nil
   --     cmd = "nextls", -- path to the executable. mutually exclusive with `port`
   --     init_options = {
-  --       mix_env = "dev",
+  --       mix_env = "ls",
   --       mix_target = "host",
   --       experimental = {
   --         completions = {
@@ -79,7 +110,7 @@ function M.setup(config, capabilities)
   --
   --     -- default settings, use the `settings` function to override settings
   --     settings = elixirls.settings({
-  --       mixEnv = "dev",
+  --       mixEnv = "ls",
   --       dialyzerEnabled = true,
   --       -- fetchDeps = false,
   --       -- enableTestLenses = false,

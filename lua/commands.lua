@@ -1,13 +1,33 @@
+_G.NOOP = function(arg)
+  print("NOOP called")
+  P(arg)
+  P(vim.api.nvim_buf_get_mark(0, "<"))
+  P(vim.api.nvim_buf_get_mark(0, ">"))
+
+  P(vim.api.nvim_buf_get_mark(0, "["))
+  P(vim.api.nvim_buf_get_mark(0, "]"))
+end
+
+local testing = function()
+  keeping_pos(function()
+    vim.go.operatorfunc = "v:lua.NOOP"
+    vim.cmd.normal({ args = { "g@i)" }, bang = false })
+    local x = vim.api.nvim_replace_termcodes("vi)il<esc>", true, true, true)
+    vim.cmd.normal({ args = { x }, bang = false })
+    NOOP()
+  end)
+  -- vim.cmd.normal({ args = { "g@i)il" }, bang = true })
+end
+
 local function kill_elixirls()
-  vim.cmd([[!ps waxl | grep "beam.smp"]])
-  local x = vim.api.nvim_exec([[!ps waxl | grep "beam.smp"]], true)
+  -- vim.cmd([[!ps waxl | grep "beam.smp"]])
+  local x = vim.api.nvim_exec2([[!ps waxl | grep "beam.smp"]], { output = true }).output
   x = vim.split(x, "\n")
   local reload = false
   for _, i in ipairs(x) do
-    if i:match("language_server") then
+    if i:match("language_server") or i:match("elixir-ls") then
       local pid = i:match("^ *[0-9]* *([0-9]*)")
-      vim.api.nvim_exec("!kill -9 " .. pid, true)
-      print("Killed ElixirLS")
+      vim.api.nvim_exec2("!kill -9 " .. pid, { output = false })
       reload = true
     end
   end
@@ -61,22 +81,22 @@ local autocmds = {
       end,
     },
   },
-  {
-    { "LspDetach" },
-    {
-      callback = function(args)
-        local file = args.file
-        if string.sub(file, #file - 1, #file) == "ex" then
-          if kill_elixirls() then
-            vim.cmd("LspStart elixirls")
-          end
-        end
-      end,
-    },
-  },
+  -- {
+  --   { "LspDetach" },
+  --   {
+  --     pattern = { "*.ex", "*.exs" },
+  --     callback = function(args)
+  --       local file = args.file
+  --       if kill_elixirls() then
+  --         vim.api.nvim_command("LspStart elixirls")
+  --       end
+  --     end,
+  --   },
+  -- },
   {
     { "VimLeavePre" },
     {
+      pattern = { "*.ex", "*.exs" },
       callback = function(_args)
         kill_elixirls()
       end,

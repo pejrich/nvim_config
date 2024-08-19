@@ -6,6 +6,7 @@ function M.setup()
   plugin.setup({
     check_ts = true,
     enable_check_bracket_line = true,
+    fast_wrap = {},
   })
 end
 

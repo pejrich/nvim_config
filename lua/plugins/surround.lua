@@ -39,6 +39,15 @@ function M.setup()
           target = "^(#{)().-(})()$",
         },
       },
+
+      ["m"] = {
+        add = { "%%{", "}" },
+        find = "%%{.-}",
+        delete = "^(%%{)().-(})()$",
+        change = {
+          target = "^(%%{)().-(})()$",
+        },
+      },
       ["p"] = {
         add = { "IO.inspect(", ")" },
         find = "IO%.inspect%b()",

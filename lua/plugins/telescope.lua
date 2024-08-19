@@ -126,6 +126,7 @@ function M.setup()
           -- ["<C-h>"] = actions.preview_scrolling_down,
           ["<D-w>"] = actions.close,
           ["<c-t>"] = trouble.open,
+          ["<c-g>"] = X.toggle_hidden,
         },
       },
     },
@@ -191,12 +192,31 @@ function M.setup()
   end, { desc = "[F]ind [N]eovim files" })
 end
 
+function X.toggle_hidden(prompt_bufnr)
+  local finders = require("telescope.finders")
+  local make_entry = require("telescope.make_entry")
+  local action_state = require("telescope.actions.state")
+
+  local opts = {}
+  opts.entry_maker = make_entry.gen_from_file(opts)
+
+  local cmd = { "fd", "--type", "f", "--hidden" }
+  local current_picker = action_state.get_current_picker(prompt_bufnr)
+  current_picker:refresh(finders.new_oneshot_job(cmd, opts), { no_ignore = true })
+end
+
 -- Extensions
 
 function X.extensions()
   local fb = require("telescope._extensions.file_browser.actions")
 
   return {
+    fzf = {
+      fuzzy = true,
+      override_generic_sorter = true, -- override the generic sorter
+      override_file_sorter = true, -- override the file sorter
+      case_mode = "smart_case", -- or "ignore_case" or "respect_case"
+    },
     file_browser = {
       -- path
       -- cwd
@@ -233,7 +253,7 @@ function X.extensions()
           ["<D-u>"] = fb.goto_parent_dir,
           ["<D-M-u>"] = fb.goto_cwd,
           ["<D-f>"] = fb.toggle_browser,
-          ["<D-h>"] = fb.toggle_hidden,
+          ["<C-g>"] = fb.toggle_hidden,
           ["<D-a>"] = fb.toggle_all,
           ["<BS>"] = fb.backspace,
           ["<CR>"] = "select_default",
@@ -249,7 +269,7 @@ function X.extensions()
           ["<D-u>"] = fb.goto_parent_dir,
           ["<D-M-u>"] = fb.goto_cwd,
           ["<D-f>"] = fb.toggle_browser,
-          ["<D-h>"] = fb.toggle_hidden,
+          ["<C-g>"] = fb.toggle_hidden,
           ["<D-a>"] = fb.toggle_all,
           ["ya"] = function(bufnr)
             m.copy_path(bufnr, "absolute")

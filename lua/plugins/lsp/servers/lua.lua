@@ -1,9 +1,9 @@
 local M = {}
 
 function M.setup(config, capabilities)
-  local neodev = require("neodev")
+  -- local neodev = require("neodev")
 
-  neodev.setup({})
+  -- neodev.setup({})
 
   config.lua_ls.setup({
     capabilities = capabilities,

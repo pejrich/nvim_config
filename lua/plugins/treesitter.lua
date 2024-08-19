@@ -15,11 +15,16 @@ function M.setup()
     matchup = {
       enable = true,
       disable = { "typescript", "javascript", "js", "ts" },
+      additional_vim_regex_highlighting = true,
+      use_languagetree = true,
+      is_supported = function(...)
+        return false
+      end,
     },
     highlight = {
       enable = true,
-      additional_vim_regex_highlighting = false,
-      use_languagetree = false,
+      additional_vim_regex_highlighting = true,
+      use_languagetree = true,
       disable = function(lang, bufnr)
         local buf_name = vim.api.nvim_buf_get_name(bufnr)
         local file_size = vim.api.nvim_call_function("getfsize", { buf_name })
@@ -152,14 +157,14 @@ function M.setup()
     },
   })
 
-  local injections = [[((sigil
-  (sigil_name) @_sigil_name
-  (quoted_content) @injection.content)
- (#eq? @_sigil_name "H")
- (#set! injection.language "heex")
- (#set! injection.combined))
-]]
-  require("vim.treesitter.query").set("elixir", "injections", injections)
+  --   local injections = [[((sigil
+  --   (sigil_name) @_sigil_name
+  --   (quoted_content) @injection.content)
+  --  (#eq? @_sigil_name "H")
+  --  (#set! injection.language "heex")
+  --  (#set! injection.combined))
+  -- ]]
+  --   require("vim.treesitter.query").set("elixir", "injections", injections)
 end
 
 function M.keymaps() end

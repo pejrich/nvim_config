@@ -1,11 +1,40 @@
 local M = {}
+local kind_icons = {
+  Text = "",
+  Method = "󰆧",
+  Function = "󰊕",
+  Constructor = "",
+  Field = "󰇽",
+  Variable = "󰂡",
+  Class = "󰠱",
+  Interface = "",
+  Module = "",
+  Property = "󰜢",
+  Unit = "",
+  Value = "󰎠",
+  Enum = "",
+  Keyword = "  ",
+  Snippet = "",
+  Color = "󰏘",
+  File = "󰈙",
+  Reference = "",
+  Folder = "󰉋",
+  EnumMember = "",
+  Constant = "󰏿",
+  Struct = "",
+  Event = "",
+  Operator = "  ",
+  TypeParameter = "  ",
+}
 
 function M.setup()
-  local plugin = require("cmp")
+  local cmp = require("cmp")
+  local lspkind = require("lspkind")
+  local cmp_autopairs = require("nvim-autopairs.completion.cmp")
   local compare = require("cmp.config.compare")
-  local mapping = plugin.mapping
+  local mapping = cmp.mapping
 
-  local bordered_window = plugin.config.window.bordered({
+  local bordered_window = cmp.config.window.bordered({
     winhighlight = "Normal:Pmenu,FloatBorder:FloatBorder,CursorLine:PmenuSel,Search:None",
     col_offset = -3,
     side_padding = 0,
@@ -24,7 +53,14 @@ function M.setup()
       end,
     },
   }
-  plugin.setup({
+  cmp.setup({
+    preselect = cmp.PreselectMode.Item,
+    keyword_length = 2,
+    snippet = {
+      expand = function(args)
+        require("luasnip").lsp_expand(args.body)
+      end,
+    },
     sorting = {
       priority_weight = 2,
       comparators = {
@@ -47,37 +83,39 @@ function M.setup()
         compare.order,
       },
     },
-    sources = plugin.config.sources(
+    sources = cmp.config.sources(
       vim.tbl_filter(function(component)
         return component ~= nil
       end, {
-        { name = "luasnip", priority_weight = 120 },
-        { name = "path", priority_weight = 110 },
-        { name = "nvim_lsp", max_view_entries = 20, priority_weight = 100 },
-        { name = "nvim_lsp_signature_help", priority_weight = 100 },
-        { name = "nvim_lua", priority_weight = 90 },
-        { name = "treesitter", priority_weight = 70 },
-        { name = "cmp_yanky" },
+        {
+          name = "luasnip",
+          group_index = 1,
+          option = { use_show_condition = true },
+          max_view_entries = 5,
+          entry_filter = function()
+            local context = require("cmp.config.context")
+            return not context.in_treesitter_capture("string") and not context.in_syntax_group("String")
+          end,
+        },
+        { name = "nvim_lsp", max_view_entries = 2, keyword_length = 4, group_index = 2 },
+        { name = "path", group_index = 3, max_view_entries = 3 },
+        { name = "nvim_lsp_signature_help", group_index = 4, max_view_entries = 5 },
+        { name = "nvim_lua", group_index = 5, max_view_entries = 5 },
+        { name = "treesitter", group_index = 6, keyword_length = 4, max_view_entries = 5 },
       }),
       {
         vim.tbl_deep_extend("force", buffer_source, {
-          keyword_length = 3,
+          keyword_length = 2,
           max_view_entries = 5,
           option = {
             keyword_length = 5,
           },
-          priority_weight = 70,
         }),
       }
     ),
     -- experimental = {
     --   native_menu = false,
     -- },
-    snippet = {
-      expand = function(args)
-        require("luasnip").lsp_expand(args.body)
-      end,
-    },
     mapping = mapping.preset.insert({
       ["<C-b>"] = mapping.scroll_docs(-4),
       ["<C-f>"] = mapping.scroll_docs(4),
@@ -92,6 +130,13 @@ function M.setup()
       completion = bordered_window,
       documentation = bordered_window,
     },
+    view = {
+      entries = {
+        name = "custom",
+        selection_order = "near_cursor",
+        follow_cursor = true,
+      },
+    },
     performance = {
       throttle = 150,
       debounce = 150,
@@ -102,34 +147,71 @@ function M.setup()
     formatting = {
       fields = { "kind", "abbr", "menu" },
       format = function(entry, vim_item)
-        local kind = require("lspkind").cmp_format({
-          mode = "symbol_text",
-          menu = {
-            luasnip = "Snip",
-            nvim_lua = "Lua",
-            nvim_lsp = "LSP",
-            buffer = "Buf",
-            path = "Path",
-            crates = "Crates",
-          },
-          maxwidth = 50,
-        })(entry, vim_item)
+        local kind = require("lspkind").cmp_format({ mode = "symbol_text", maxwidth = 50 })(entry, vim_item)
+
         local strings = vim.split(kind.kind, "%s", { trimempty = true })
-        kind.kind = " " .. strings[1] .. " "
-        if strings[2] then
-          kind.menu = "    [" .. kind.menu .. ": " .. strings[2] .. "]"
-        else
-          kind.menu = "    [" .. kind.menu .. "]"
-        end
+        -- kind.kind = " " .. (strings[1] or "") .. " "
+        kind.kind = " " .. (kind_icons[vim_item.kind] or strings[1] or "") .. " "
+        kind.menu = "    (" .. (strings[2] or "") .. ")"
+
         return kind
       end,
     },
+    -- formatting = {
+    --   fields = { "kind", "abbr", "menu" },
+    --   format = function(entry, vim_item)
+    --     local kind = require("lspkind").cmp_format({
+    --       mode = "symbol_text",
+    --       menu = {
+    --         luasnip = "Snip",
+    --         nvim_lua = "Lua",
+    --         nvim_lsp = "LSP",
+    --         buffer = "Buf",
+    --         path = "Path",
+    --         crates = "Crates",
+    --       },
+    --       maxwidth = 50,
+    --     })(entry, vim_item)
+    --     local strings = vim.split(kind.kind, "%s", { trimempty = true })
+    --     kind.kind = " " .. strings[1] .. " "
+    --     if strings[2] then
+    --       kind.menu = "    [" .. kind.menu .. ": " .. strings[2] .. "]"
+    --     else
+    --       kind.menu = "    [" .. kind.menu .. "]"
+    --     end
+    --     return kind
+    --   end,
+    -- },
   })
 
-  -- autopairs :shake_hands:
   local autopairs = require("nvim-autopairs.completion.cmp")
 
-  plugin.event:on("confirm_done", autopairs.on_confirm_done())
+  cmp.event:on("confirm_done", autopairs.on_confirm_done())
+
+  cmp.setup.cmdline("/", {
+    mapping = cmp.mapping.preset.cmdline(),
+    sources = {
+      { name = "buffer" },
+    },
+  })
+  cmp.setup.cmdline(":", {
+    mapping = cmp.mapping.preset.cmdline(),
+    sources = cmp.config.sources({
+      { name = "path", max_view_entries = 5 },
+    }, {
+      {
+        name = "cmdline",
+
+        max_view_entries = 5,
+        option = {
+
+          max_view_entries = 5,
+          ignore_cmds = { "Man", "!" },
+        },
+      },
+    }),
+  })
+  print("CMP Setup")
 end
 
 return M
