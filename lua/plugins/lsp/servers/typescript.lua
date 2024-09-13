@@ -1,7 +1,7 @@
 local M = {}
 
 function M.setup(config, capabilities)
-  config.tsserver.setup({
+  config.ts_ls.setup({
     capabilities = capabilities,
     on_attach = function(client)
       -- Formatting is handled by conform/prettier

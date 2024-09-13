@@ -83,6 +83,7 @@ function M.setup()
         inactive = { c = { fg = colors.fg, bg = colors.bg } },
       },
     },
+    -- extensions = { "aerial", "quickfix", "fzf", "toggleterm" },
     sections = {
       -- these are to remove the defaults
       lualine_a = {},
@@ -189,6 +190,14 @@ function M.setup()
   --   color = { fg = colors.fg },
   -- })
 
+  ins_left({
+    "harpoon2",
+    indicators = { " 1 ", " 2 ", " 3 ", " 4 " },
+    active_indicators = { "[1]", "[2]", "[3]", "[4]" },
+    color_active = { fg = colors.blue },
+    _separator = "",
+    no_harpoon = "-",
+  })
   ins_left({
     "filename",
     path = 1,

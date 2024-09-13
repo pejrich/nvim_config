@@ -46,38 +46,57 @@ function M.setup()
       },
     },
   })
+  vim.keymap.set("n", "<M-p>", function()
+    if require("yanky").can_cycle() == true then
+      require("yanky").cycle(1)
+    else
+      require("substitute").operator()
+    end
+  end)
 end
 
 function M.keymaps()
   require("which-key").add({
-    {
-      "y",
-      function()
-        if require("noice").api.statusline.mode.get() then
-          vim.api.nvim_feedkeys([["ay]], "n", true)
-          return [["ay]]
-        else
-          vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<Plug>(YankyYank)", true, true, true), "m", true)
-        end
-      end,
-      mode = { "n", "x" },
-      expr = true,
-      nowait = true,
-    },
+    -- {
+    --   "y",
+    --   function()
+    --     -- if require("noice").api.statusline.mode.get() then
+    --     --   -- vim.api.nvim_feedkeys([["ay]], "n", true)
+    --     --   return [["ay]]
+    --     -- else
+    --     -- end
+    --     vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<Plug>(YankyYank)", true, true, true), "m", true)
+    --   end,
+    --   mode = { "n", "x" },
+    --   expr = true,
+    --   nowait = true,
+    -- },
+    --
+    -- {
+    --   "p",
+    --   function()
+    --     -- if require("noice").api.statusline.mode.get() then
+    --     --   -- vim.api.nvim_feedkeys([["ap]], "n", true)
+    --     --   return [["ap]]
+    --     -- else
+    --     -- end
+    --     vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<Plug>(YankyPutAfter)", true, true, true), "m", true)
+    --   end,
+    --   mode = { "n", "x" },
+    --   expr = true,
+    --   nowait = true,
+    -- },
+    --
 
     {
-      "p",
-      function()
-        if require("noice").api.statusline.mode.get() then
-          vim.api.nvim_feedkeys([["ap]], "n", true)
-          return [["ap]]
-        else
-          vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<Plug>(YankyPutAfter)", true, true, true), "m", true)
-        end
-      end,
+      "y",
+      "<Plug>(YankyYank)",
       mode = { "n", "x" },
-      expr = true,
-      nowait = true,
+    },
+    {
+      "p",
+      "<Plug>(YankyPutAfter)",
+      mode = { "n", "x" },
     },
     {
       "<M-p>",

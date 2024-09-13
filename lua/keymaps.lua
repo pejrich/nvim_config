@@ -6,7 +6,9 @@ trim_leading = function(string)
     return string
   end
 end
-
+vim.keymap.set("n", "\\}", "f}")
+vim.keymap.set("n", "\\]", "f]")
+vim.keymap.set("n", "\\)", "f)")
 local trim_trailing
 trim_trailing = function(string)
   if string:sub(#string, #string) == " " then
@@ -17,11 +19,12 @@ trim_trailing = function(string)
 end
 -- Return to same cursor position after canceling visual selection with <esc>
 vim.cmd([[
+  execute "inoremap <S-CR> m9<S-CR>"
   execute "nnoremap v m9v"
   execute "nnoremap V m9V"
   execute "nnoremap <C-v> m9<C-v>"
-  execute "vnoremap <esc> <esc>`9"
-  execute "vnoremap <cr> <esc>"
+  execute "xnoremap <esc> <esc>`9"
+  execute "xnoremap <cr> <esc>"
 ]])
 
 vim.keymap.set("n", "vv", function()
@@ -62,8 +65,6 @@ require("editor.editing").keymaps()
 -- require("editor.buffers").keymaps()
 -- require("editor.windows").keymaps()
 require("editor.terminal").keymaps()
-require("editor.debug").keymaps()
-
 -- Plugins
 require("plugins.lazy").keymaps()
 
@@ -86,7 +87,6 @@ require("plugins.yanky").keymaps()
 require("plugins.toggleterm").keymaps()
 require("plugins.lsp.mason").keymaps()
 require("plugins.lsp.lspsaga").keymaps()
-require("plugins.lsp.lsp-lines").keymaps()
 require("plugins.git.lazygit").keymaps()
 require("plugins.git.fugit2").keymaps()
 require("plugins.git.gitsigns").keymaps()
@@ -195,6 +195,11 @@ wk.add({
   { "<C-w>J", desc = "Move window to bottom" },
   { "<C-w>K", desc = "Move window to top" },
 })
+
+vim.keymap.set({ "n", "v" }, "<A-d>", "10j", { nowait = true })
+vim.keymap.set({ "n", "v" }, "<A-u>", "10k", { nowait = true })
+vim.keymap.set({ "n", "v" }, "<C-S-D>", "10j", { nowait = true })
+vim.keymap.set({ "n", "v" }, "<C-S-U>", "10k", { nowait = true })
 
 local delim_map = { ["("] = 1, [")"] = 1, ["{"] = 1, ["}"] = 1, ["["] = 1, ["]"] = 1, ['"'] = 1, ["'"] = 1, [""] = 1 }
 vim.keymap.set("v", "<leader>da", function()

@@ -17,9 +17,6 @@ function M.setup()
       disable = { "typescript", "javascript", "js", "ts" },
       additional_vim_regex_highlighting = true,
       use_languagetree = true,
-      is_supported = function(...)
-        return false
-      end,
     },
     highlight = {
       enable = true,

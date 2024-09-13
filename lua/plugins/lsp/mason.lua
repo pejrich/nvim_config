@@ -15,7 +15,7 @@ function M.setup()
       "html",
       "lua_ls",
       "emmet_language_server",
-      "tsserver",
+      "ts_ls",
       "yamlls",
     },
   })

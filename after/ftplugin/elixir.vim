@@ -3,6 +3,8 @@ let g:autoformat_autoindent = 0
 let g:autoformat_retab = 0
 let g:autoformat_remove_trailing_spaces = 0
 
+let b:match_words = b:match_words . ",<%\\{-}!--:--%\\{-}>,<:>,<\\@<=[ou]l\\>[^>]*\\%(>\\|$\\):<\\@<=li\\>:<\\@<=/[ou]l>,<\\@<=dl\\>[^>]*\\%(>\\|$\\):<\\@<=d[td]\\>:<\\@<=/dl>,<\\@<=\\([^/!][^ \\t>]*\\)[^>]*\\%(>\\|$\\):<\\@<=/\\1>"
+
 let elixir_module_with_function = '\%([A-Z]\+[a-z\dA-Z]\+\.\)*\k\+'
 let elixir_variable = '\k\+'
 " supported: atoms, module attributes and variables, anonymous functions

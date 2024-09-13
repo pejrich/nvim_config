@@ -155,8 +155,26 @@ function M.setup()
   pcall(require("telescope").load_extension, "fzf")
   pcall(require("telescope").load_extension, "ui-select")
 
+  local find_frecancy = function()
+    require("telescope").extensions.frecency.frecency({ workspace = "CWD", matcher = "fuzzy" })
+  end
+
   -- See `:help telescope.builtin`
   local builtin = require("telescope.builtin")
+  vim.keymap.set("n", "<leader>fa", function()
+    builtin.find_files({
+      find_command = {
+        "fd",
+        "--type",
+        "f",
+        "--no-ignore-vcs",
+        "--color=never",
+        "--hidden",
+        "--follow",
+      },
+      hidden = true,
+    })
+  end, { desc = "[F]ind [A]ll" })
   vim.keymap.set("n", "<leader>fh", builtin.help_tags, { desc = "[F]ind [H]elp" })
   vim.keymap.set("n", "<leader>fk", builtin.keymaps, { desc = "[F]ind [K]eymaps" })
   -- vim.keymap.set("n", "<leader>sf", builtin.find_files, { desc = "[S]earch [F]iles" })
@@ -164,6 +182,7 @@ function M.setup()
   vim.keymap.set("n", "<leader>fw", builtin.grep_string, { desc = "[F]ind current [W]ord" })
   vim.keymap.set("n", "<leader>fg", builtin.live_grep, { desc = "[F]ind by [G]rep" })
   vim.keymap.set("n", "<leader>fd", builtin.diagnostics, { desc = "[F]ind [D]iagnostics" })
+  vim.keymap.set("n", "<leader>fr", find_frecancy, { desc = "[F]ind f[R]ecency" })
   -- vim.keymap.set("n", "<leader>fr", builtin.resume, { desc = "[F]ind [R]esume" })
   vim.keymap.set("n", "<leader>f.", builtin.oldfiles, { desc = '[F]ind Recent Files ("." for repeat)' })
   vim.keymap.set("n", "<leader><leader><leader>", builtin.buffers, { desc = "[ ] Find existing buffers" })
@@ -200,7 +219,15 @@ function X.toggle_hidden(prompt_bufnr)
   local opts = {}
   opts.entry_maker = make_entry.gen_from_file(opts)
 
-  local cmd = { "fd", "--type", "f", "--hidden" }
+  local cmd = {
+    "fd",
+    "--type",
+    "f",
+    "--no-ignore-vcs",
+    "--color=never",
+    "--hidden",
+    "--follow",
+  }
   local current_picker = action_state.get_current_picker(prompt_bufnr)
   current_picker:refresh(finders.new_oneshot_job(cmd, opts), { no_ignore = true })
 end
@@ -216,6 +243,9 @@ function X.extensions()
       override_generic_sorter = true, -- override the generic sorter
       override_file_sorter = true, -- override the file sorter
       case_mode = "smart_case", -- or "ignore_case" or "respect_case"
+    },
+    frecency = {
+      matcher = "fuzzy",
     },
     file_browser = {
       -- path

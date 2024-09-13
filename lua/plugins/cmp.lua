@@ -30,7 +30,6 @@ local kind_icons = {
 function M.setup()
   local cmp = require("cmp")
   local lspkind = require("lspkind")
-  local cmp_autopairs = require("nvim-autopairs.completion.cmp")
   local compare = require("cmp.config.compare")
   local mapping = cmp.mapping
 
@@ -123,7 +122,12 @@ function M.setup()
       ["<C-c>"] = mapping.complete(),
       ["<C-y>"] = mapping.abort(),
       ["<D-w>"] = mapping.abort(),
-      ["<S-CR>"] = mapping.confirm({ select = true }), -- Accept currently selected item. Set `select` to `false` to only confirm explicitly selected items.
+      ["<S-CR>"] = function()
+        vim.cmd("norm! m9")
+        mapping.confirm({ select = true })() -- Accept currently selected item. Set `select` to `false` to only confirm explicitly selected items.
+        local curpos = require("utils").cur_pos()
+        vim.api.nvim_buf_set_mark(0, "9", curpos[1], curpos[2], {})
+      end,
       ["<C-e>"] = mapping.confirm({ select = true }), -- Accept currently selected item. Set `select` to `false` to only confirm explicitly selected items.
     }),
     window = {
@@ -184,9 +188,9 @@ function M.setup()
     -- },
   })
 
-  local autopairs = require("nvim-autopairs.completion.cmp")
+  -- local autopairs = require("nvim-autopairs.completion.cmp")
 
-  cmp.event:on("confirm_done", autopairs.on_confirm_done())
+  -- cmp.event:on("confirm_done", autopairs.on_confirm_done())
 
   cmp.setup.cmdline("/", {
     mapping = cmp.mapping.preset.cmdline(),

@@ -7,10 +7,10 @@ function M.setup()
     updateevents = "TextChanged,TextChangedI",
   })
   require("luasnip.loaders.from_snipmate").lazy_load({ paths = { "~/.config/nvim/lua/snippets" } })
-  vim.keymap.set({ "i" }, "<C-K>", function()
+  vim.keymap.set({ "i" }, "<C-L>", function()
     ls.expand()
   end, { silent = true })
-  vim.keymap.set({ "i", "s" }, "<C-k>", function()
+  vim.keymap.set({ "i", "s" }, "<C-l>", function()
     if ls.expand_or_jumpable() then
       ls.expand_or_jump()
     end
@@ -20,7 +20,7 @@ function M.setup()
       ls.jump(-1)
     end
   end, { silent = true })
-  vim.keymap.set({ "i", "s" }, "<C-l>", function()
+  vim.keymap.set({ "i", "s" }, "<C-;>", function()
     if ls.choice_active() then
       ls.change_choice(1)
     end

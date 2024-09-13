@@ -59,6 +59,9 @@ function M.find_back(char, pos, count)
     end
   end
 end
+function M.esc_codes(string)
+  return vim.api.nvim_replace_termcodes(string, true, true, true)
+end
 function M.cur_pos()
   return vim.api.nvim_win_get_cursor(0)
 end

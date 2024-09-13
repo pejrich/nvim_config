@@ -61,7 +61,9 @@ end
 
 function M.keymaps()
   require("which-key").add({
-    { "<leader>fp", m.open_project_search, desc = "[P]roject" },
+    { "<leader>fP", m.open_project_search, desc = "[P]roject Spectre" },
+    { "<leader>fp", require("search").search, desc = "[P]roject" },
+    { "<leader>fu", require("search").find_func_under_cursor, desc = "[F]ind Function [U]nder Cursor" },
   })
   -- K.mapseq { "<Leader>sp", "Open search in project", m.open_project_search, mode = "n" }
   -- K.mapseq { "<Leader>sc", "Open search in current buffer", m.open_current_buffer_search, mode = "n" }

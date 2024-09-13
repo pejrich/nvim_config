@@ -94,7 +94,7 @@ opt.scrolloff = 10
 
 -- Set highlight on search, but clear on pressing <Esc> in normal mode
 opt.hlsearch = true
-vim.keymap.set("n", "<Esc>", "<cmd>nohlsearch<CR>")
+vim.keymap.set("n", "<Esc>", "<cmd>nohlsearch<CR><esc>")
 
 -- [[ Basic Autocommands ]]
 --  See :help lua-guide-autocommands

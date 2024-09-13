@@ -25,26 +25,26 @@ local plugins = {
     "nvim-lua/plenary.nvim",
   },
   {
-    dir = "~/Documents/programming/nvim_plugins/scratch_pad.nvim",
+    dir = "~/.config/nvim/nvim_plugins/scratch_pad.nvim",
     lazy = false,
     config = function()
       require("scratch_pad").setup()
     end,
   },
   {
-    dir = "~/Documents/programming/nvim_plugins/mrs_doubtfire.nvim",
+    dir = "~/.config/nvim/nvim_plugins/mrs_doubtfire.nvim",
     config = function()
       require("mrs_doubtfire").setup({})
     end,
   },
   {
-    dir = "~/Documents/programming/nvim_plugins/lopsided.nvim",
+    dir = "~/.config/nvim/nvim_plugins/lopsided.nvim",
     config = function()
       require("lopsided").setup({})
     end,
   },
   {
-    dir = "~/Documents/programming/nvim_plugins/chuck_and_grab.nvim",
+    dir = "~/.config/nvim/nvim_plugins/chuck_and_grab.nvim",
     config = function()
       require("chuck_and_grab").setup()
     end,
@@ -107,8 +107,6 @@ local plugins = {
   },
   {
     "folke/flash.nvim",
-    -- dir = "/Users/peterrichards/Downloads/flash.nvim-main",
-    -- dir = "/Users/peterrichards/Documents/programming/nvim_plugins/flash.nvim",
     branch = "main",
     event = "VeryLazy",
     config = require("plugins.flash").setup,
@@ -120,12 +118,6 @@ local plugins = {
     end,
   },
 
-  -- {
-  --   "xiyaowong/virtcolumn.nvim",
-  --   version = "*",
-  --   event = "BufEnter",
-  --   config = require("plugins.virtcolumn").setup,
-  -- },
   {
     "ibhagwan/fzf-lua",
     -- optional for icon support
@@ -214,12 +206,12 @@ local plugins = {
       require("elixir-extras").setup_multiple_clause_gutter()
     end,
   },
-  {
-    "windwp/nvim-autopairs",
-    branch = "master",
-    event = "InsertEnter",
-    config = require("plugins.autopairs").setup,
-  },
+  -- {
+  --   "windwp/nvim-autopairs",
+  --   branch = "master",
+  --   event = "InsertEnter",
+  --   config = require("plugins.autopairs").setup,
+  -- },
   {
     "tpope/vim-sleuth", -- Detect tabstop and shiftwidth automatically
     version = "*",
@@ -248,7 +240,14 @@ local plugins = {
       vim.g.matchup_matchparen_offscreen = { method = "popup" }
     end,
   },
-
+  -- {
+  --
+  --   dir = "~/Downloads/vim-matchup",
+  --   config = function()
+  --     vim.o.matchpairs = "(:),{:},[:]"
+  --     vim.g.matchup_matchparen_offscreen = { method = "popup" }
+  --   end,
+  -- },
   {
     "kylechui/nvim-surround",
     branch = "main",
@@ -520,6 +519,7 @@ local plugins = {
     branch = "master",
     dependencies = {
       "nvim-lua/plenary.nvim",
+      "nvim-telescope/telescope-frecency.nvim",
       {
         "nvim-telescope/telescope-fzf-native.nvim",
         build = "make",
@@ -629,7 +629,7 @@ local plugins = {
     end,
   },
   {
-    dir = "~/Documents/programming/nvim_plugins/space.nvim",
+    dir = "~/.config/nvim/nvim_plugins/space.nvim",
     config = function() end,
   },
   {
@@ -755,6 +755,45 @@ local plugins = {
   {
     "stevearc/profile.nvim",
     lazy = false,
+  },
+  {
+    "letieu/harpoon-lualine",
+    dependencies = {
+      {
+        "ThePrimeagen/harpoon",
+        branch = "harpoon2",
+      },
+    },
+  },
+  {
+    "m4xshen/hardtime.nvim",
+    dependencies = { "MunifTanjim/nui.nvim", "nvim-lua/plenary.nvim" },
+    opts = { max_count = 8 },
+  },
+  {
+    "mrjones2014/legendary.nvim",
+    version = "v2.13.9",
+    -- since legendary.nvim handles all your keymaps/commands,
+    -- its recommended to load legendary.nvim before other plugins
+    priority = 10000,
+    lazy = false,
+    -- sqlite is only needed if you want to use frecency sorting
+    dependencies = { "kkharji/sqlite.lua" },
+    config = function()
+      require("legendary").setup({ extensions = { lazy_nvim = true } })
+    end,
+  },
+  {
+    "unblevable/quick-scope",
+  },
+  {
+    "jiangmiao/auto-pairs",
+    config = function()
+      vim.g.AutoPairsShortcutToggle = ""
+    end,
+  },
+  {
+    "isobit/vim-caddyfile",
   },
 }
 for _, i in ipairs(require("themes")) do

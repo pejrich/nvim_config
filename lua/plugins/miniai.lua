@@ -27,6 +27,37 @@ function M.setup()
       v = { { "[%s%{]+[^:=]-%s*[:=]()%s*()[^%},]-()%s*()[%},]", "[%s%{]+[^:=]-%s*[:=]()%s*()[^%},]-()%s*()$" } },
       -- [x]ml/html attribute = `class="..."`, `data-state={...}`, etc.
       x = { { [[%s()[%w%-]+=%b{}()%s*]], [[%s()[%w%-]+=["'].-["']()%s*]] } },
+      -- [c]lass in HTML
+      c = {
+
+        {
+          '[%"]()()[^%s%"]*()[%s]()',
+          '()[%s]()[^%s%"]*()()[%"]',
+          '[%s]()()[^%s%"]*()[%s]()',
+        },
+      },
+      -- single [C]har
+      C = function(ai, id, opts)
+        if ai == "i" then
+          local col = vim.fn.col(".")
+          local line = vim.fn.line(".")
+          return {
+            vis_mode = "v",
+            from = { col = col, line = line },
+            to = { col = col, line = line },
+          }
+        else
+          local col = vim.fn.col(".")
+          local line = vim.fn.line(".")
+          local colmax = #vim.fn.getline(".")
+          return {
+            vis_mode = "v",
+            from = { col = math.max(col - 1, 1), line = line },
+            to = { col = math.min(col + 1, colmax), line = line },
+          }
+        end
+      end,
+
       X = { "^[^=]*=()%s*().+()()$" },
       -- Substring
       S = {
