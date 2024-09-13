@@ -605,12 +605,6 @@ local plugins = {
     config = require("plugins.comment").setup,
   },
 
-  -- markdown
-  {
-    "iamcco/markdown-preview.nvim",
-    build = require("plugins.markdown-preview").setup,
-  },
-
   -- misc
   {
     "tenxsoydev/tabs-vs-spaces.nvim",
