@@ -52,7 +52,7 @@ local plugins = {
   },
 
   {
-    dir = "~/Documents/programming/nvim_plugins/mini.ai",
+    dir = "~/.config/nvim/nvim_plugins/mini.ai",
     -- "echasnovski/mini.ai",
     -- branch = "main",
     -- event = "VeryLazy",
@@ -60,7 +60,7 @@ local plugins = {
   },
 
   {
-    dir = "~/Documents/programming/nvim_plugins/nvim-ts-autotag",
+    dir = "~/.config/nvim/nvim_plugins/nvim-ts-autotag",
     -- branch = "main",
     dependencies = "nvim-treesitter/nvim-treesitter",
     config = function()
@@ -168,7 +168,7 @@ local plugins = {
 
   {
     -- "ibhagwan/fzf-lua",
-    dir = "~/Downloads/fzf-lua",
+    dir = "~/.config/nvim/nvim_plugins/fzf-lua",
     -- optional for icon support
     dependencies = { "nvim-tree/nvim-web-devicons" },
     -- commit = "86d2aa8",
