@@ -5,7 +5,6 @@ vim.keymap.set({ "n", "v" }, "/", "/\\v", { noremap = true })
 -- copy file path to `unnamedplus` clipboard
 
 -- vim.cmd("!echo -n %:p | pbcopy")
-vim.keymap.set({ "n" }, "cp", [[:let @+ = expand("%:p")<CR>]], { noremap = true, desc = "Copy file path to `unnamedplus` clipboard" })
 -- command-mode completion
 vim.api.wildmenu = true
 -- Wildmenu ignores case
@@ -84,7 +83,7 @@ opt.inccommand = "split"
 
 -- Show which line your cursor is on
 opt.cursorline = true
-opt.guicursor = { "n-v-c-sm:hor10-iCursor-blinkwait300-blinkon200-blinkoff150,i-ci-ve:ver25,r-cr-o:hor20" }
+-- opt.guicursor = { "n-v-c-sm:hor10-iCursor-blinkwait300-blinkon200-blinkoff150,i-ci-ve:ver25,r-cr-o:hor20" }
 
 -- Minimal number of screen lines to keep above and below the cursor.
 opt.scrolloff = 10

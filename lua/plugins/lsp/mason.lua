@@ -21,9 +21,7 @@ function M.setup()
   })
 end
 
-function M.keymaps()
-  K.mapseq({ "<D-p>l", "LSP: Open package manager", "<Cmd>Mason<CR>", mode = "n" })
-end
+function M.keymaps() end
 
 function M.ensure_hidden()
   if m.is_active() then

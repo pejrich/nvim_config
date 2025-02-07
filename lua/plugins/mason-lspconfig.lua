@@ -157,6 +157,16 @@ function M.setup()
         },
       },
     },
+    cssls = {
+      settings = {
+        css = {
+          validate = false,
+          lint = {
+            unknownAtRules = "ignore",
+          },
+        },
+      },
+    },
   }
 
   -- Ensure the servers and tools above are installed

@@ -6,6 +6,13 @@ _G.K = {}
 _G.WK = {}
 -- Which key non <leader> prefixed
 _G.WKN = {}
+_G.map = function(table, fun)
+  local ret = {}
+  for k, v in pairs(table) do
+    ret[#ret + 1] = fun(k, v)
+  end
+  return ret
+end
 _G.P = function(...)
   local args = {}
   for _, arg in ipairs({ ... }) do
@@ -15,13 +22,13 @@ _G.P = function(...)
   return ...
 end
 _G.keeping_pos = function(fun)
-  local cursor = vim.api.nvim_win_get_cursor(0)
-  print("saving ")
-  P(cursor)
+  vim.cmd("set eventignore=all")
+  vim.cmd("set lazyredraw")
+  local state = vim.fn.winsaveview()
   fun()
-  print("resoring")
-  P(cursor)
-  vim.api.nvim_win_set_cursor(0, cursor)
+  vim.cmd("set nolazyredraw")
+  vim.cmd("set eventignore=")
+  vim.fn.winrestview(state)
 end
 -- _G.P = function(v)
 --   print(vim.inspect(v))

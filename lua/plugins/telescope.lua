@@ -155,10 +155,6 @@ function M.setup()
   pcall(require("telescope").load_extension, "fzf")
   pcall(require("telescope").load_extension, "ui-select")
 
-  local find_frecancy = function()
-    require("telescope").extensions.frecency.frecency({ workspace = "CWD", matcher = "fuzzy" })
-  end
-
   -- See `:help telescope.builtin`
   local builtin = require("telescope.builtin")
   vim.keymap.set("n", "<leader>fa", function()
@@ -182,7 +178,7 @@ function M.setup()
   vim.keymap.set("n", "<leader>fw", builtin.grep_string, { desc = "[F]ind current [W]ord" })
   vim.keymap.set("n", "<leader>fg", builtin.live_grep, { desc = "[F]ind by [G]rep" })
   vim.keymap.set("n", "<leader>fd", builtin.diagnostics, { desc = "[F]ind [D]iagnostics" })
-  vim.keymap.set("n", "<leader>fr", find_frecancy, { desc = "[F]ind f[R]ecency" })
+  vim.keymap.set("n", "<leader>fr", M.frecency, { desc = "[F]ind f[R]ecency" })
   -- vim.keymap.set("n", "<leader>fr", builtin.resume, { desc = "[F]ind [R]esume" })
   vim.keymap.set("n", "<leader>f.", builtin.oldfiles, { desc = '[F]ind Recent Files ("." for repeat)' })
   vim.keymap.set("n", "<leader><leader><leader>", builtin.buffers, { desc = "[ ] Find existing buffers" })
@@ -513,4 +509,7 @@ function m.copy_path(bufnr, fmt)
   end
 end
 
+function M.frecency()
+  require("telescope").extensions.frecency.frecency({ workspace = "CWD", matcher = "fuzzy" })
+end
 return M

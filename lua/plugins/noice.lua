@@ -5,9 +5,6 @@ function M.setup()
   local plugin = require("noice")
 
   plugin.setup({
-    messages = {
-      view = "mini",
-    },
     cmdline = {
       format = {
         search_down = { view = "cmdline" },
@@ -20,6 +17,7 @@ function M.setup()
           enabled = false,
         },
       },
+
       -- override markdown rendering so that **cmp** and other plugins use **Treesitter**
       override = {
         ["vim.lsp.util.convert_input_to_markdown_lines"] = true,
@@ -29,6 +27,8 @@ function M.setup()
     },
     presets = {
       cmdline_output_to_split = false,
+      command_palette = true,
+      inc_rename = true,
       lsp_doc_border = true,
     },
     views = {

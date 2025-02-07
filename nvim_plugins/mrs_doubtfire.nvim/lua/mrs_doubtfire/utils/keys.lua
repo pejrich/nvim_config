@@ -4,7 +4,8 @@ M.replace_termcode = function(str)
   return vim.api.nvim_replace_termcodes(str, true, false, true)
 end
 M.HORIZ = { "Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P" }
-M.VERT = { "A", "S", "D", "F", "G", "H", "J", "K", "L" }
+-- M.VERT = { "A", "S", "D", "F", "G", "H", "J", "K", "L" }
+M.VERT = { "L", "K", "J", "H", "G", "F", "D", "S", "A" }
 M.LOOKUP = {}
 for i, j in ipairs(M.HORIZ) do
   M.LOOKUP[j] = { index = i, dir = "horiz", char = j }

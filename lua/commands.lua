@@ -34,20 +34,57 @@ local function kill_elixirls()
   return reload
 end
 local autocmds = {
-
+  -- {
+  --   { "BufReadCmd" },
+  --   {
+  --     pattern = "*",
+  --     callback = function(args)
+  --       P(vim.b.read_long_file)
+  --       if vim.b.read_long_file ~= "YES" then
+  --         local cmd = "head -1 '" .. args.file .. "' | wc -c"
+  --         local handle = io.popen(cmd)
+  --         local result = handle:read("*a")
+  --         handle:close()
+  --         result = string.gsub(result, "^%s*(.-)%s*$", "%1")
+  --         result = tonumber(result)
+  --
+  --         if result > 1024 * 1024 then
+  --           --   -- vim.notify("Long line. 'y' to open.")
+  --           --   -- local char = vim.fn.getchar()
+  --           vim.ui.select({ "Yes", "No" }, { prompt = "Long single line. Open?" }, function(choice)
+  --             if choice == "No" then
+  --               vim.cmd("bp | sp | bn | bd | bw")
+  --             else
+  --               vim.b.read_long_file = "YES"
+  --               vim.cmd("execute 'e " .. args.file .. "'")
+  --             end
+  --           end)
+  --         else
+  --           vim.cmd("execute 'e " .. args.file .. "'")
+  --           vim.cmd("execute 'doautocmd BufReadPost " .. args.file .. "'")
+  --         end
+  --       else
+  --         vim.cmd("execute 'e " .. args.file .. "'")
+  --         vim.cmd("execute 'doautocmd BufReadPost " .. args.file .. "'")
+  --         vim.b.read_long_file = nil
+  --       end
+  --     end,
+  --   },
+  -- },
   {
     { "BufEnter" },
     {
       pattern = "*",
       callback = function()
         if vim.bo.ft == "help" then
+          vim.wo.relativenumber = true
           vim.api.nvim_command("wincmd L")
         end
-        local apl = vim.b.AutoPairsList
-        table.insert(apl, { "%{", "}", { key = "}", mapclose = 1, multiline = 1 } })
-        vim.b.AutoPairsList = apl
-        vim.b.AutoPairsShortcutToggle = ""
-        vim.b.AutoPairsFlyMode = 1
+        -- local apl = vim.b.AutoPairsList
+        -- table.insert(apl, { "%{", "}", { key = "}", mapclose = 1, multiline = 1 } })
+        -- vim.b.AutoPairsList = apl
+        -- vim.b.AutoPairsShortcutToggle = ""
+        -- vim.b.AutoPairsFlyMode = 1
         -- vim.cmd([[let b:AutoPairsList = b:AutoPairsList . ",['%{', '}', {'key': '}', 'mapclose': 1, 'multiline': 1}]"]])
       end,
     },

@@ -54,9 +54,13 @@ for _, i in ipairs(disabled) do
 end
 function M.setup()
   require("various-textobjs").setup({
-    useDefaultKeymaps = true,
-    disabledKeymaps = keys,
-    notifyNotFound = true,
+    keymaps = {
+      useDefaults = true,
+      disabledDefaults = keys,
+    },
+    notify = {
+      whenObjectNotFound = true,
+    },
   })
 end
 return M

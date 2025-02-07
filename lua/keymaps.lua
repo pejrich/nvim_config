@@ -1,3 +1,5 @@
+-- Possible mapping keys
+-- <C-c>, <C-b>, <C-g>, <C-r>, <C-t>, <C-y>, <C-_>, H, L
 local trim_leading
 trim_leading = function(string)
   if string:sub(1, 1) == " " then
@@ -17,6 +19,16 @@ trim_trailing = function(string)
     return string
   end
 end
+-- Control-BS to delete char forward in insert
+vim.keymap.set("i", "<C-BS>", "<C-o>x", { noremap = true })
+-- Copy current module
+vim.keymap.set({ "n" }, "<leader>ym", function()
+  local line = vim.api.nvim_buf_get_lines(0, 0, 1, false)[1]
+  local module = line:match("^defmodule (.-) do$")
+  vim.cmd("let @+ = '" .. module .. "'")
+end, { noremap = true, desc = "Yank Elixir Module Name" })
+-- Copy current file
+vim.keymap.set({ "n" }, "cp", [[:let @+ = expand("%:p")<CR>]], { noremap = true, desc = "Copy file path to `unnamedplus` clipboard" })
 -- Return to same cursor position after canceling visual selection with <esc>
 vim.cmd([[
   execute "inoremap <S-CR> m9<S-CR>"
@@ -34,7 +46,7 @@ end)
 vim.keymap.del({ "n" }, "gcc")
 -- Change norm `C` to function like the opposite of norm `D`. C deletes to start of line, D deletes to end of line
 vim.cmd([[
-  nnoremap <silent> C :<c-u>normal! d^<cr>
+  nnoremap <silent> C :<c-u>normal! ld^<cr>
 ]])
 local dmmns = vim.api.nvim_create_namespace("dontmoveme")
 local function dont_move_me(fn)
@@ -138,7 +150,7 @@ wk.add({
   { l("d"), group = "[D]ocument" },
   { l("do"), "<cmd>!open -R %:p<cr>", desc = "[O]pen in Finder" },
   { l("df"), group = "[F]ormat" },
-  { l("dfj"), "<cmd>%!jq<cr>", desc = "[J]SON" },
+  { l("dfj"), "<cmd>%!json_format_string<cr>", desc = "[J]SON" },
   { l("dfe"), "<cmd>!mix format %:p<cr>", desc = "[E]lixir" },
   { l("g"), group = "[G]o to" },
   { l("gd"), "<cmd>Lspsaga goto_definition<cr>", desc = "[G]o to [D]efinition" },
@@ -257,7 +269,7 @@ wk.add({
 -- wk.register(WK, { prefix = "<leader>" })
 -- wk.register(WKN, {})
 
-local fuzzy = "Telescope"
+local fuzzy = "Fzf"
 local toggleFuzzy = function()
   if fuzzy == "Telescope" then
     vim.keymap.set({ "n" }, "<C-p>", "<cmd>FzfLua files<cr>", { desc = "Find Files" })
@@ -271,9 +283,10 @@ local toggleFuzzy = function()
   vim.notify("Fuzzy switched to " .. fuzzy)
 end
 vim.keymap.set({ "n" }, "\\\\gv", "<Plug>(VM-Reselect-Last)<cr>", { desc = "Multicursor Reselelect Last" })
--- vim.keymap.set({ "n" }, "<C-p>", "<cmd>FzfLua files<cr>", { desc = "Find Files" })
-vim.keymap.set({ "n" }, "<C-p>", "<cmd>Telescope find_files<cr>", { desc = "Find Files" })
-vim.keymap.set({ "n" }, "<D-p>", "<cmd>Telescope find_files<cr>", { desc = "Find Files" })
+vim.keymap.set({ "n" }, "<C-p>", "<cmd>FzfLua files<cr>", { desc = "Find Files" })
+vim.keymap.set({ "n" }, "<D-p>", "<cmd>FzfLua files<cr>", { desc = "Find Files" })
+-- vim.keymap.set({ "n" }, "<C-p>", "<cmd>Telescope find_files<cr>", { desc = "Find Files" })
+-- vim.keymap.set({ "n" }, "<D-p>", "<cmd>Telescope find_files<cr>", { desc = "Find Files" })
 vim.keymap.set({ "n" }, "<leader><C-p>", toggleFuzzy, { desc = "FzfLua <> Telescope" })
 vim.keymap.set({ "n" }, "<C-S-p>", "<cmd>Telescope buffers<cr>", { desc = "Buffer Select" })
 vim.keymap.set({ "n" }, "<C-f>", "<cmd>Telescope live_grep<cr>", { desc = "Live grep" })

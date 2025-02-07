@@ -32,7 +32,7 @@ end
 local function perform_sub(string, sub_exp)
   print("Perform sub")
   print(vim.inspect(sub_exp))
-  local args = { "echo", "-e", '"' .. table.concat(string, "\n") .. '', "|", "perl", "-pe", vim.fn.shellescape(sub_exp) }
+  local args = { "echo", "-e", '"' .. table.concat(string, "\n") .. "", "|", "perl", "-pe", vim.fn.shellescape(sub_exp) }
   P(table.concat(args, " "))
   -- local args = { "nvim_pcre", vim.fn.shellescape(table.concat(string, "\n")), sub_exp }
   local handle = io.popen(table.concat(args, " "), "r")
@@ -120,10 +120,8 @@ local M = {}
 
 function M.setup()
   require("live-command").setup({
-    defaults = {
-      enable_highlighting = true,
-      inline_highlighting = true,
-    },
+    enable_highlighting = true,
+    inline_highlighting = true,
     commands = {
       PS = { cmd = "PS" },
     },

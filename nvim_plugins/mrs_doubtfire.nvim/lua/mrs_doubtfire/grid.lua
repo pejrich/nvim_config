@@ -37,6 +37,7 @@ function M.draw_horiz_line(line)
   M.clear_horiz_line()
   local char = vim.api.nvim_exec("echo getline(" .. line + 1 .. ")", true)
   local id = vim.api.nvim_buf_set_extmark(0, grid_ns, line, 0, {
+    strict = false,
     hl_group = "IncSearch",
     hl_eol = true,
     virt_text = { { char, "IncSearch" } },
@@ -84,17 +85,22 @@ function M.distribute_A_L(min, max)
   return M.distribute_vert(min, max)
 end
 function M.distribute_vert(min, max)
-  local gap = ((max - min) / #keys.VERT) / 2
+  local height = max - min
+  local space = height - #keys.VERT - 4
   local ret = {}
-  local count = min
-  for i = 1, #keys.VERT do
-    ret[keys.VERT[i]] = math.floor(count)
-    count = count + gap + gap
+  ret[keys.VERT[1]] = min + 2
+  local count = min + 3
+  for i = 2, #keys.VERT do
+    local gap = math.floor((1 / (#keys.VERT - i + 1)) * space)
+    space = space - gap
+    ret[keys.VERT[i]] = count + gap + 1
+    count = count + gap + 1
   end
   return ret
 end
 -- A..L
 function M.get_vert_indexes(bounds)
+  bounds = bounds or util_ui.buffer_window_bounds()
   return M.distribute_vert(bounds.minY, bounds.maxY)
 end
 
@@ -103,20 +109,22 @@ function M.distribute_Q_P(min, max)
 end
 -- Left to Right Q-P
 function M.distribute_horiz(min, max)
-  local gap = math.floor(((max - min) / #keys.HORIZ))
+  local width = max - min
+  local space = width - #keys.HORIZ - 8
   local ret = {}
-  local count = min + 1
-  local flex = math.ceil(#keys.HORIZ / 2) + 3
-  for i = 1, #keys.HORIZ do
-    ret[keys.HORIZ[i]] = count
-    local new_count = count + gap - flex
-    count = new_count > count and new_count or count + 1
-    flex = flex - 1
+  ret[keys.HORIZ[1]] = min + 3
+  local count = min + 4
+  for i = 2, #keys.HORIZ do
+    local gap = math.floor((1 / (#keys.HORIZ - i + 1)) * space)
+    space = space - gap
+    ret[keys.HORIZ[i]] = count + gap
+    count = count + gap
   end
   return ret
 end
 -- Q..P
 function M.get_horiz_indexes(bounds)
+  bounds = bounds or util_ui.buffer_window_bounds()
   return M.distribute_horiz(bounds.minX, bounds.maxX)
 end
 
@@ -172,22 +180,55 @@ end
 function M.parse_char(char)
   local charinfo = keys.lookup_key(char)
   if charinfo then
-    local bounds = util_ui.buffer_window_bounds()
+    local win_bounds = util_ui.buffer_window_bounds()
+    local buf_bounds = util_ui.visible_bounds()
     if charinfo.dir == "vert" then
-      local x = M.get_vert_indexes(bounds)
+      local x = M.get_vert_indexes(win_bounds)
       if x[charinfo.char] then
-        charinfo.line = x[charinfo.char]
+        charinfo.line = math.min(buf_bounds.maxY - 1, x[charinfo.char])
         M.flash_horiz_line(x[charinfo.char])
       end
     else
-      local x = M.get_horiz_indexes(bounds)
+      local x = M.get_horiz_indexes(win_bounds)
 
       if x[charinfo.char] then
-        charinfo.col = x[charinfo.char]
+        charinfo.col = math.min(buf_bounds.maxX, x[charinfo.char])
         M.flash_vert_line(x[charinfo.char])
       end
     end
   end
   return charinfo
 end
+
+function M.jump_keys()
+  vim.api.nvim_set_hl(0, "DefineDim1", { fg = "#733E49", force = true, default = true })
+  vim.api.nvim_set_hl(0, "DefineDim2", { fg = "#904955", force = true, default = true })
+  vim.api.nvim_buf_clear_namespace(0, ns, 0, -1)
+  local bounds = util_ui.buffer_window_bounds()
+  local horiz = M.get_horiz_indexes(bounds)
+  local vert = M.get_vert_indexes(bounds)
+  for hk, hv in pairs(horiz) do
+    for vk, vv in pairs(vert) do
+      vim.api.nvim_buf_set_extmark(0, ns, vv - 2, hv, {
+        strict = false,
+        end_row = vv - 1,
+        virt_text = { { "  " .. hk .. "  ", "Define" } },
+        virt_text_win_col = hv - bounds.minX,
+      })
+      vim.api.nvim_buf_set_extmark(0, ns, vv, hv, {
+        strict = false,
+        end_row = vv + 1,
+        virt_text = { { "  " .. hk .. "  ", "Define" } },
+        virt_text_win_col = hv - bounds.minX,
+      })
+      vim.api.nvim_buf_set_extmark(0, ns, vv - 1, hv, {
+        strict = false,
+        end_row = vv,
+        virt_text = { { " " .. vk .. " " .. vk .. " ", "Define" } },
+        virt_text_win_col = hv - bounds.minX,
+      })
+    end
+  end
+end
+-- P(M.jump_keys())
 return M

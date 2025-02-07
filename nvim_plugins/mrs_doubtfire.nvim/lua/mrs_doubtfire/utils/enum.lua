@@ -1,6 +1,16 @@
 local M = {}
 ---@alias Enum any[]
 
+---@param table table
+---@return table
+M.swap = function(table)
+  local ret = {}
+  for k, v in pairs(table) do
+    ret[v] = k
+  end
+  return ret
+end
+
 ---@param start integer
 ---@param stop integer
 ---@return integer[]

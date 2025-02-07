@@ -119,10 +119,6 @@ snippet defma
 	defmacro ${1:name} do
 		${0}
 	end
-snippet defmo
-	defmodule ${1:`substitute(vim_snippets#Filename(), '\(_\|^\)\(.\)', '\u\2', 'g')`} do
-		${0}
-	end
 snippet e=
   <%= ${1:value} %>
 snippet e-
@@ -157,6 +153,10 @@ snippet docs
 	@doc ~S"""
 	${0}
 	"""
+snippet @d dickdock
+	@doc """
+  ${0}
+  """
 snippet docf
 	@doc false
 snippet im
@@ -240,20 +240,6 @@ snippet qu
 snippet beh
 	@behaviour ${1:Mix.Task}
 	${0}
-snippet p
-	|> ${0}
-snippet >e pipe to each
-	|> Enum.each(fn ${1} -> ${0} end)
-snippet >m pipe to map
-	|> Enum.map(fn ${1} -> ${0} end)
-snippet >f pipe to filter
-	|> Enum.filter(fn ${1} -> ${0} end)
-snippet >r pipe to reduce
-	|> Enum.reduce(${1:acc}, fn ${2}, ${3:acc} -> ${0} end)
-snippet >i pipe to inspect
-	|> IO.inspect()
-snippet >il pipe to inspect with label
-	|> IO.inspect(label: "${1:label}")
 snippet cs
 	@doc false
 	def child_spec(${1:_opts}) do
@@ -318,6 +304,12 @@ snippet comp
     """
   end
 
+snippet ~H sigil_H
+  ~H"""
+    ${1}
+  """
+
+
 snippet div
   <div>${1}</div>
 
@@ -331,6 +323,6 @@ snippet attd
   attr(${1::name}, ${2::string}, default: ${3:default})
 
 snippet seccom
-  ####################${1/./K/g}#########################################################
-  ################  ${1:comment}  ##################
-  ####################${1/./*/g}#########################################################
+  #####------------------------------------#####
+  #####               ${1:comment}
+  #####------------------------------------#####

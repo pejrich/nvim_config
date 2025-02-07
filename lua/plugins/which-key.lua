@@ -14,7 +14,9 @@ function M.setup()
       separator = "", -- symbol used between a key and it's label
       group = "+", -- symbol prepended to a group
     },
-
+    triggers = {
+      { "<auto>", mode = "nsot" },
+    },
     -- disable = {
     --   trigger = function(ctx)
     --     return true

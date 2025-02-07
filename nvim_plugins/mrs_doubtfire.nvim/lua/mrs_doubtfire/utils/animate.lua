@@ -39,6 +39,8 @@ local hls = {
   "MD_Trail_5",
 }
 function M.move_cursor(start_pos, end_pos, time)
+  P(end_pos)
+  P(start_pos)
   local adiff = end_pos[1] - start_pos[1]
   local bdiff = end_pos[2] - start_pos[2]
   local dir = start_pos[2] < end_pos[2] and "right" or "left"
@@ -59,13 +61,7 @@ function M.move_cursor(start_pos, end_pos, time)
       end
     end
     for _, i in ipairs(hl_opts) do
-      vim.api.nvim_buf_set_extmark(
-        0,
-        ns,
-        i.pos[1] - 1,
-        i.pos[2],
-        { hl_group = i.hl_group, end_col = i.end_col, strict = false }
-      )
+      vim.api.nvim_buf_set_extmark(0, ns, i.pos[1] - 1, i.pos[2], { hl_group = i.hl_group, end_col = i.end_col, strict = false })
     end
     vim.api.nvim_win_set_cursor(0, hl_opts[1].pos)
   end, function()

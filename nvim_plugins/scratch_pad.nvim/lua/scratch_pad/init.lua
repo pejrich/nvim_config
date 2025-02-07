@@ -49,7 +49,7 @@ end
 -- P(detect.detect(M.get_languages()))
 function M.setup()
   local km = vim.keymap.set
-  km("n", "<A-n>", M.new_buffer, { noremap = true, silent = true, expr = true })
+  km("n", "<A-s>", M.new_buffer, { noremap = true, silent = true, expr = true })
   km("n", "<leader><leader>s", M.open_picker, { noremap = true, silent = true, expr = true })
   M.state = st:load_state()
   -- P(M.state)

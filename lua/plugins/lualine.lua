@@ -37,7 +37,7 @@ function M.setup()
   local linemode = require("lualine.utils.mode")
   local theme = require("kanagawa.colors").setup().theme
 
-  local throttled_command_status = throttle_leading(require("noice").api.status.command.get, 100)
+  -- local throttled_command_status = throttle_leading(require("noice").api.status.command.get, 100)
   local throttled_mode_status = throttle_leading(require("noice").api.status.mode.get, 100)
   local throttled_search_status = throttle_leading(require("noice").api.status.search.get, 100)
   -- Color table for highlights
@@ -249,28 +249,46 @@ function M.setup()
     color = { fg = colors.fg, gui = "bold" },
   })
 
-  ins_right({
-    throttled_command_status,
+  local macro_rec = {
     cond = function()
-      return throttled_command_status() ~= nil
+      return vim.fn.reg_recording() ~= "" and vim.o.cmdheight == 0
+    end,
+    function()
+      return " [" .. vim.fn.reg_recording() .. "]"
+    end,
+    color = { fg = colors.orange, bold = true },
+  }
+  vim.opt.showcmdloc = "statusline"
+  local show_cmd = {
+    -- cond = function()
+    --   P(vim.o.cmdheight)
+    --   return vim.o.cmdheight == 0
+    -- end,
+    function()
+      return "%3.5(%S%)"
     end,
     color = { fg = colors.orange },
-  })
-  ins_right({
-    throttled_mode_status,
+  }
+  local show_search = {
     cond = function()
-      return throttled_mode_status() ~= nil
+      return vim.v.hlsearch ~= 0 and vim.o.cmdheight == 0
     end,
-    color = { fg = colors.orange },
-  })
-  ins_right({
-
-    throttled_search_status,
-    cond = function()
-      return throttled_search_status() ~= nil
+    function()
+      local ok, search = pcall(vim.fn.searchcount)
+      if ok and search.total then
+        return string.format("[%d/%d]", search.current, math.min(search.total, search.maxcount))
+      end
     end,
-    color = { fg = colors.orange },
-  })
+  }
+  --   return {
+  --     init = function(self)
+  --     end,
+  --     provider = function(self)
+  --     end,
+  --   }
+  ins_right(macro_rec)
+  ins_right(show_cmd)
+  ins_right(show_search)
 
   -- Add components to right sections
   ins_right({
@@ -542,9 +560,7 @@ end
 --   -- m.ensure_tabline_visibility_mode()
 -- end
 
-function M.keymaps()
-  K.map({ "<M-s>", "Toggle filename in statusline", m.toggle_filename, mode = { "n", "i", "v" } })
-end
+function M.keymaps() end
 
 function M.show()
   local plugin = require("lualine")

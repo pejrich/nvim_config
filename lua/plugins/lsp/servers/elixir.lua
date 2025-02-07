@@ -44,7 +44,7 @@ function M.setup(config, capabilities)
     cmd_env = { MIX_ENV = "ls" },
     settings = {
       mixEnv = "ls",
-      elixirLS = { dialyzerEnabled = false, fetchDeps = false, mixEnv = "ls" },
+      elixirLS = { dialyzerEnabled = false, fetchDeps = true, mixEnv = "ls" },
     },
     on_exit = function(code, signal)
       vim.notify("elixir ls exit " .. code .. " signal: " .. signal)

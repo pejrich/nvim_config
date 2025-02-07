@@ -4,6 +4,7 @@ _G.MD = M
 
 M.const = require("mrs_doubtfire.constants")
 M.c = {
+  bounds = require("mrs_doubtfire.bounds"),
   jumper = require("mrs_doubtfire.jumper"),
   labeler = require("mrs_doubtfire.labeler"),
   cartesian = require("mrs_doubtfire.utils.cartesian"),
@@ -133,6 +134,8 @@ M.load_highlights = function()
     { fg = "#dcd7ba", bg = "#c34043", sp = "#e69039", underline = true, force = true, bold = true, default = true }
   )
 
+  vim.api.nvim_set_hl(0, "MD_BoldUnderline", { sp = "#e69039", underline = true, force = true, bold = true, default = true })
+
   vim.api.nvim_set_hl(0, "MD_Trail_1", { fg = "#223249", bg = "#FF9E3B", force = true, default = true })
   vim.api.nvim_set_hl(0, "MD_Trail_2", { fg = "#223249", bg = "#DD8A38", force = true, default = true })
   vim.api.nvim_set_hl(0, "MD_Trail_3", { fg = "#223249", bg = "#BA7536", force = true, default = true })
@@ -168,13 +171,7 @@ M.init_fwd = function()
       if count <= 2 then
         print(row:sub(i, i) .. " " .. line .. " " .. (i - 1))
         -- vim.notify("adding " .. row:sub(i, i))
-        vim.api.nvim_buf_set_extmark(
-          0,
-          fwdns,
-          line,
-          col,
-          { strict = true, hl_group = hl[count + 1], end_col = col + 1 }
-        )
+        vim.api.nvim_buf_set_extmark(0, fwdns, line, col, { strict = true, hl_group = hl[count + 1], end_col = col + 1 })
         -- vim.api.nvim_buf_set_extmark(0, fwdns, line, i, { strict = true, hl_group = hl[count], end_col = i + 1 })
         state[row:sub(i, i)] = count + 1
       end
@@ -186,7 +183,7 @@ M.init_fwd = function()
 end
 M.setup = function(opts)
   -- vim.keymap.set("n", "//", "?")
-  vim.keymap.set("n", "//", M.init_jump)
+  vim.keymap.set({ "n", "o", "x" }, "//", M.init_jump)
   -- vim.keymap.set("n", "f", M.init_fwd)
   -- vim.keymap.set("n", "//]", function()
   --   M.jump_fwd(math.max(vim.v.count, 1))

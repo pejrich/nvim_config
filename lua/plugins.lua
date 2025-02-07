@@ -26,6 +26,7 @@ local plugins = {
   },
   {
     dir = "~/.config/nvim/nvim_plugins/scratch_pad.nvim",
+
     lazy = false,
     config = function()
       require("scratch_pad").setup()
@@ -48,6 +49,53 @@ local plugins = {
     config = function()
       require("chuck_and_grab").setup()
     end,
+  },
+
+  {
+    dir = "~/Documents/programming/nvim_plugins/mini.ai",
+    -- "echasnovski/mini.ai",
+    -- branch = "main",
+    -- event = "VeryLazy",
+    config = require("plugins.miniai").setup,
+  },
+
+  {
+    dir = "~/Documents/programming/nvim_plugins/nvim-ts-autotag",
+    -- branch = "main",
+    dependencies = "nvim-treesitter/nvim-treesitter",
+    config = function()
+      -- require("nvim-ts-autotag").setup({
+      --   opts = {
+      --     -- Defaults
+      --     enable_close = true, -- Auto close tags
+      --     enable_rename = true, -- Auto rename pairs of tags
+      --     enable_close_on_slash = false, -- Auto close on trailing </
+      --   },
+      --   filetypes = { "html", "xml", "eruby", "heex", "embedded_template" },
+      -- })
+
+      local autotag = require("nvim-ts-autotag.internal")
+      vim.keymap.set("i", ">", function()
+        local res = require("ultimate-autopair.core").run_run(">")
+        vim.api.nvim_feedkeys(res, "n", false)
+
+        -- local row, col = unpack(vim.api.nvim_win_get_cursor(0))
+        -- vim.api.nvim_buf_set_text(0, row - 1, col, row - 1, col, { res })
+        -- local row, col = unpack(vim.api.nvim_win_get_cursor(0))
+        -- vim.api.nvim_buf_set_text(0, row - 1, col, row - 1, col, { ">" })
+        autotag.close_tag()
+        -- vim.api.nvim_win_set_cursor(0, { row, col + 1 })
+
+        -- ls.expand_auto()
+      end, { remap = false, expr = false })
+    end,
+    lazy = true,
+    event = "VeryLazy",
+  },
+
+  {
+    dir = "~/.config/nvim/nvim_plugins/space.nvim",
+    config = function() end,
   },
 
   -- theming
@@ -119,7 +167,8 @@ local plugins = {
   },
 
   {
-    "ibhagwan/fzf-lua",
+    -- "ibhagwan/fzf-lua",
+    dir = "~/Downloads/fzf-lua",
     -- optional for icon support
     dependencies = { "nvim-tree/nvim-web-devicons" },
     -- commit = "86d2aa8",
@@ -221,12 +270,6 @@ local plugins = {
   },
 
   {
-    "echasnovski/mini.ai",
-    branch = "main",
-    event = "VeryLazy",
-    config = require("plugins.miniai").setup,
-  },
-  {
     "ThePrimeagen/harpoon",
     branch = "harpoon2",
     dependencies = { "nvim-lua/plenary.nvim" },
@@ -268,7 +311,12 @@ local plugins = {
   },
   {
     "sitiom/nvim-numbertoggle",
-    config = function() end,
+    config = function()
+      local attrs = vim.api.nvim_get_hl(0, { name = "LineNr", link = false })
+      attrs.bold = true
+      attrs.force = true
+      vim.api.nvim_set_hl(0, "LineNrAbove", attrs)
+    end,
   },
   { "MunifTanjim/nui.nvim", lazy = true },
   { "nvim-neotest/nvim-nio" },
@@ -341,25 +389,25 @@ local plugins = {
     branch = "master",
     event = "BufEnter",
   },
-  {
-    "pejrich/nvim-treesitter-context",
-    branch = "master",
-    opts = {
-      -- max_lines = 5,
-      filter = function(line, ext)
-        local patterns = {
-          ex = "^%s*%#",
-          exs = "^%s*%#",
-          lua = "^%s*%-%-",
-        }
-        local pattern = patterns[ext]
-        return not pattern or line:find(pattern) == nil
-      end,
-      on_attach = function(buf)
-        return vim.fn.wordcount().bytes < 1000000
-      end,
-    },
-  },
+  -- {
+  --   "pejrich/nvim-treesitter-context",
+  --   branch = "master",
+  --   opts = {
+  --     -- max_lines = 5,
+  --     filter = function(line, ext)
+  --       local patterns = {
+  --         ex = "^%s*%#",
+  --         exs = "^%s*%#",
+  --         lua = "^%s*%-%-",
+  --       }
+  --       local pattern = patterns[ext]
+  --       return not pattern or line:find(pattern) == nil
+  --     end,
+  --     on_attach = function(buf)
+  --       return vim.fn.wordcount().bytes < 1000000
+  --     end,
+  --   },
+  -- },
 
   -- lsp
   {
@@ -369,24 +417,6 @@ local plugins = {
   {
     "RRethy/nvim-treesitter-endwise",
     branch = "master",
-  },
-  {
-    "windwp/nvim-ts-autotag",
-    branch = "main",
-    dependencies = "nvim-treesitter/nvim-treesitter",
-    config = function()
-      require("nvim-ts-autotag").setup({
-        opts = {
-          -- Defaults
-          enable_close = true, -- Auto close tags
-          enable_rename = true, -- Auto rename pairs of tags
-          enable_close_on_slash = false, -- Auto close on trailing </
-        },
-        filetypes = { "html", "xml", "eruby", "heex", "elixir", "embedded_template" },
-      })
-    end,
-    lazy = true,
-    event = "VeryLazy",
   },
 
   {
@@ -623,10 +653,6 @@ local plugins = {
     end,
   },
   {
-    dir = "~/.config/nvim/nvim_plugins/space.nvim",
-    config = function() end,
-  },
-  {
     "rafcamlet/nvim-luapad",
     config = function()
       require("luapad").setup({})
@@ -680,7 +706,7 @@ local plugins = {
     },
     config = function()
       require("spider").setup({
-        skipInsignificantPunctuation = true,
+        skipInsignificantPunctuation = false,
         consistentOperatorPending = true, -- see "Consistent Operator-pending Mode" in the README
         subwordMovement = true,
         customPatterns = {}, -- check "Custom Movement Patterns" in the README for details
@@ -735,6 +761,7 @@ local plugins = {
   },
   {
     "stevearc/quicker.nvim",
+    branch = "master",
     config = function()
       require("quicker").setup({})
     end,
@@ -760,11 +787,6 @@ local plugins = {
     },
   },
   {
-    "m4xshen/hardtime.nvim",
-    dependencies = { "MunifTanjim/nui.nvim", "nvim-lua/plenary.nvim" },
-    opts = { max_count = 8 },
-  },
-  {
     "mrjones2014/legendary.nvim",
     version = "v2.13.9",
     -- since legendary.nvim handles all your keymaps/commands,
@@ -780,15 +802,78 @@ local plugins = {
   {
     "unblevable/quick-scope",
   },
+  -- {
+  --   "jiangmiao/auto-pairs",
+  --   config = function()
+  --     vim.g.AutoPairsShortcutToggle = ""
+  --   end,
+  -- },
   {
-    "jiangmiao/auto-pairs",
-    config = function()
-      vim.g.AutoPairsShortcutToggle = ""
-    end,
+    "altermo/ultimate-autopair.nvim",
+    event = { "InsertEnter", "CmdlineEnter" },
+    config = require("plugins.ultimate-autopair").setup,
   },
   {
     "isobit/vim-caddyfile",
   },
+  {
+    "LunarVim/bigfile.nvim",
+    config = function()
+      require("bigfile").setup({
+        filesize = 5, -- size of the file in MiB, the plugin round file sizes to the closest MiB
+        pattern = { "*" }, -- autocmd pattern or function see <### Overriding the detection of big files>
+        features = { -- features to disable
+          "indent_blankline",
+          "illuminate",
+          "lsp",
+          "treesitter",
+        },
+      })
+    end,
+  },
+  {
+    dir = "~/.config/nvim/nvim_plugins/any-jump.vim",
+  },
+  {
+    "chrisbra/Colorizer",
+  },
+  {
+    "vim-scripts/AnsiEsc.vim",
+  },
+  {
+    "stevearc/oil.nvim",
+    ---@module 'oil'
+    ---@type oil.SetupOpts
+    opts = {},
+    -- Optional dependencies
+    dependencies = { { "echasnovski/mini.icons", opts = {} } },
+    config = function()
+      require("oil").setup()
+    end,
+    -- dependencies = { "nvim-tree/nvim-web-devicons" }, -- use if prefer nvim-web-devicons
+  },
+  {
+    "debugloop/layers.nvim",
+    opts = {},
+  },
+  {
+    "mrcjkb/rustaceanvim",
+    version = "^5", -- Recommended
+    lazy = false, -- This plugin is already lazy
+  },
+  {
+    "chrisbra/Recover.vim",
+  },
+  {
+    "mbbill/undotree",
+  },
+  {
+    "jakerobers/vim-hexrgba",
+  },
+  -- {
+  --   "rebelot/heirline.nvim",
+  --   config = require("plugins.heirline").setup,
+  -- },
 }
 for _, i in ipairs(require("themes")) do
   table.insert(plugins, i)

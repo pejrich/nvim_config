@@ -13,13 +13,17 @@ function M.search()
   local query = nil
   require("uiux").input({ prompt = "Query (" .. type .. "): " }, function(term)
     query = term
-    M.history[#M.history + 1] = query
-    if ask_for_path then
-      require("uiux").input({ prompt = "Path: ", default = "" }, function(input)
-        do_search(type, query, input)
-      end)
+    if query == "" then
+      M.search()
     else
-      do_search(type, query, "")
+      M.history[#M.history + 1] = query
+      if ask_for_path then
+        require("uiux").input({ prompt = "Path: ", default = "" }, function(input)
+          do_search(type, query, input)
+        end)
+      else
+        do_search(type, query, "")
+      end
     end
   end, {
     {

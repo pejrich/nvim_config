@@ -41,7 +41,7 @@ function M.setup()
       },
 
       ["m"] = {
-        add = { "%%{", "}" },
+        add = { "%{", "}" },
         find = "%%{.-}",
         delete = "^(%%{)().-(})()$",
         change = {

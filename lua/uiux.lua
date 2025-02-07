@@ -18,7 +18,8 @@ local function update_from_resp(buf, resp)
 end
 local function wininput(opts, on_confirm, keymaps, win_opts)
   -- create a "prompt" buffer that will be deleted once focus is lost
-  local buf = vim.api.nvim_create_buf(false, false)
+  local buf = vim.api.nvim_create_buf(false, true)
+  vim.bo[buf].filetype = "TelescopePrompt"
   vim.bo[buf].buftype = "prompt"
   vim.bo[buf].bufhidden = "wipe"
 

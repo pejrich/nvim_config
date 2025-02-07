@@ -153,6 +153,18 @@ end
 -- -- vim.api.nvim_set_hl(0, 'IndentBlanklineContextChar',  {fg = TypeHl.fg})
 -- -- vim.api.nvim_set_hl(0, 'IndentBlanklineContextStart', {sp = TypeHl.fg, underline = true})
 --
+-- function M.tobj()
+--   local c1 = M.get_char()
+--   local c2 = M.get_char()
+--   vim.notify("Chars: " .. c1 .. " - " .. c2)
+--   local pos = mrk.get_curpos()
+--   local line = mrk.get_line(pos[1])
+--   -- vim.notify(line)
+--   local start, stop = line:match("()%" .. c1 .. ".-%" .. c2 .. "()")
+--   P(string.sub(line, start, stop - 1))
+-- end
+-- P(("vim.notify"):match("()n.-f()"))
+-- P(string.sub("vim.notify", 5, 9))
 function M.setup(_opts)
   -- local hl_groups = vim.api.nvim_get_hl(0, {})
   vim.api.nvim_create_autocmd({ "ColorScheme" }, {
@@ -160,16 +172,14 @@ function M.setup(_opts)
       -- local TypeHl = vim.api.nvim_get_hl_by_name("IncSearch", true)
       -- local TypeHl2 = vim.api.nvim_get_hl_by_name("DiffDelete", true)
       -- vim.api.nvim_set_hl(0, "LopsidedHighlight", { fg = hex(TypeHl.background), bg = hex(TypeHl2.foreground) })
-      vim.api.nvim_create_autocmd(
-        "BufEnter",
-        { group = M.augroup, desc = "Setup code for lopsided.nvim", once = true, callback = M.main }
-      )
+      vim.api.nvim_create_autocmd("BufEnter", { group = M.augroup, desc = "Setup code for lopsided.nvim", once = true, callback = M.main })
       vim.cmd([[
         " highlight default Lopsided guibg=#ff007c gui=bold ctermfg=198 cterm=bold ctermbg=darkgreen
         hi default LopsidedHighlight guifg=#1034a6 guibg=#f5f5dc ctermfg=19 ctermbg=230
       ]])
     end,
   })
+  -- vim.keymap.set({ "o", "v" }, "I", M.tobj, { noremap = true, silent = true })
   -- km("n", "va?", function()
   --   M.visual_interactive("around")
   -- end, { noremap = true, silent = true })

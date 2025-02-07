@@ -1,5 +1,6 @@
 local M = {}
 
+function M.add_debug_prints() end
 local function split(str, delim)
   local t = {}
   for str2 in string.gmatch(str, "([^" .. delim .. "]+)") do

@@ -2,21 +2,46 @@ local M = {}
 local l = {}
 local next_next = function()
   local char = vim.fn.getcharstr()
-  vim.cmd("exe 'norm vi" .. char .. "o\rllvi" .. char .. "'")
+  vim.cmd("exe 'norm vi" .. char .. "ollvi" .. char .. "'")
+end
+
+local prev_prev = function()
+  local char = vim.fn.getcharstr()
+  vim.cmd("exe 'norm vip" .. char .. "hhvip" .. char .. "'")
 end
 function M.setup()
   vim.keymap.set("o", "iN", next_next)
   vim.keymap.set("x", "iN", next_next)
+
+  vim.keymap.set("o", "iP", prev_prev)
+  vim.keymap.set("x", "iP", prev_prev)
   local ai = require("mini.ai")
   ai.setup({
     n_lines = 50000,
     mappings = {
       around_next = "an",
       inside_next = "in",
-      around_last = "aL",
-      inside_last = "iL",
+      around_last = "ap",
+      inside_last = "ip",
+      inside_cover = "ii",
+      around_cover = "ai",
     },
     custom_textobjects = {
+
+      -- [L]eft is roughly the LHS of an assigment
+      L = { "()()%f[%w][a-zA-Z0-9_%[%]%.]+() =()" },
+      -- [R]ight is roughly the RHS of an assignment
+      R = {
+        {
+          [[= ()[a-zA-Z0-9%s_%[%]%.%"%']+%b()()]],
+          [[= ()[a-zA-Z0-9%s_%[%]%.%"%']+%b[]()]],
+          [[= ()[a-zA-Z0-9%s_%[%]%.%"%']+%b{}()]],
+          "= ()%b{asdf}()",
+          "= ()%b%(%)()",
+          "= ()%b%[%]()",
+          [[= ()[a-zA-Z0-9%s_%[%]%.%"%']+()]],
+        },
+      },
       -- [K]ey = roughly anything to the left of `=` or `:`, until SOL, `{[(`, `,`
       k = {
         { "^%s*[^:=%s%{%[,]+%s*[:=]", "[%s%{%[,]+[^:=]-%s*[:=]", "^[^:=%[%{%(]+[:=]" },
@@ -26,7 +51,7 @@ function M.setup()
       -- [V]alue = roughly anything to the right of `=` or `:`, up until `,`, `]})`
       v = { { "[%s%{]+[^:=]-%s*[:=]()%s*()[^%},]-()%s*()[%},]", "[%s%{]+[^:=]-%s*[:=]()%s*()[^%},]-()%s*()$" } },
       -- [x]ml/html attribute = `class="..."`, `data-state={...}`, etc.
-      x = { { [[%s()[%w%-]+=%b{}()%s*]], [[%s()[%w%-]+=["'].-["']()%s*]] } },
+      x = { { [[%s()():?[%w%-]+=%b{}()%s*()]], [[%s()():?[%w%-]+=["'].-["']()%s*()]] } },
       -- [c]lass in HTML
       c = {
 
@@ -34,6 +59,7 @@ function M.setup()
           '[%"]()()[^%s%"]*()[%s]()',
           '()[%s]()[^%s%"]*()()[%"]',
           '[%s]()()[^%s%"]*()[%s]()',
+          '[%"]()[%s]*()[^%s%"]*()[%s]*()[%"]',
         },
       },
       -- single [C]har
@@ -57,7 +83,6 @@ function M.setup()
           }
         end
       end,
-
       X = { "^[^=]*=()%s*().+()()$" },
       -- Substring
       S = {
@@ -67,6 +92,8 @@ function M.setup()
           "%W()()%d+()[_%- ]?()", -- number
 
           "^()()%w[%l%d]+()[_%- ]?()", -- camelCase or lowercase
+
+          "%l()()%u[%l%d]+()[_%- ]?()", -- camelCase or lowercase
           "^()()%u[%u%d]+()[_%- ]?()", -- UPPER_CASE
           "^()()%d+()[_%- ]?()", -- number
         },
@@ -88,11 +115,11 @@ function M.setup()
         i = { "@block.inner", "@conditional.inner", "@loop.inner" },
       }, {}),
       ["?"] = function(...)
-        print("? CALLED")
         local args = { ... }
         return require("plugins.miniai.lopsided").call(args[1])
       end,
-      b = ai.gen_spec.treesitter({ a = "@function.outer", i = "@function.inner" }, {}),
+
+      b = ai.gen_spec.treesitter({ a = "@block.outer", i = "@block.inner" }, {}),
       M = ai.gen_spec.treesitter({ a = "@class.outer", i = "@class.inner" }, {}),
       -- t = { '<([%p%w]-)%f[^<%w][^<>]->.-</%1>', '^<.->().*()</[^/]->$' },
       t = ai.gen_spec.treesitter({ a = "@function.outer", i = "@function.inner" }, {}),

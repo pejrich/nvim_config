@@ -128,7 +128,28 @@ function M.setup()
       "heex",
     },
   })
-  config.cssls.setup({})
+  config.cssls.setup({
+    settings = {
+      css = {
+        validate = false,
+        lint = {
+          unknownAtRules = "ignore",
+        },
+      },
+    },
+    default_config = {
+
+      settings = {
+        css = {
+          validate = false,
+          lint = {
+            unknownAtRules = "ignore",
+            unknown_at_rules = "ignore",
+          },
+        },
+      },
+    },
+  })
   config.html.setup({})
 end
 

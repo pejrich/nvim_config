@@ -4,7 +4,7 @@ function M.setup()
   require("flash").setup({
     modes = {
       search = {
-        enabled = true,
+        enabled = false,
         mode = function(str)
           return "\\<" .. str
         end,

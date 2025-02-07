@@ -406,46 +406,51 @@ function M:ctrl_key_pressed(key)
       local cursor = vim.api.nvim_win_get_cursor(0)
       if charinfo.line then
         local line = vim.api.nvim_buf_get_lines(0, charinfo.line, charinfo.line + 1, false)
-        vim.api.nvim_win_set_cursor(0, { charinfo.line + 1, math.min(line[1]:len(), cursor[2]) })
+        MD.c.animate.move_cursor(cursor, { charinfo.line + 1, math.min(line[1]:len(), cursor[2]) }, SLIDE_MS)
       end
       if charinfo.col then
         local line = vim.api.nvim_buf_get_lines(0, cursor[1] - 1, cursor[1], false)
         local diff = charinfo.col - line[1]:len()
-        if diff > 0 and (diff / charinfo.col) > 0.1 then
-          local lines = vim.api.nvim_buf_get_lines(0, cursor[1] - 7, cursor[1] + 7, false)
-          local jumped = false
-          local max_index = nil
-          local max_length = 0
-          for i = 0, 5 do
-            local l1 = lines[6 + i]
-            local l2 = lines[6 - i]
-            if l1:len() > max_length then
-              max_index = cursor[1] + i - 1
-              max_length = l1:len()
-            end
-            if l2:len() > max_length then
-              max_index = cursor[1] - i - 1
-              max_length = l2:len()
-            end
-            local diff1 = charinfo.col - l1:len()
-            local diff2 = charinfo.col - l2:len()
-            if diff1 < 0 or (diff1 > 0 and (diff1 / charinfo.col) < 0.1) then
-              jumped = true
-              MD.c.animate.move_cursor(cursor, { cursor[1] + i - 1, math.min(charinfo.col - 1, l1:len()) }, SLIDE_MS)
-              break
-            end
-            if diff2 < 0 or (diff2 > 0 and (diff2 / charinfo.col) < 0.1) then
-              jumped = true
-              MD.c.animate.move_cursor(cursor, { cursor[1] - i - 1, math.min(charinfo.col - 1, l2:len()) }, SLIDE_MS)
-              break
-            end
-          end
-          if not jumped then
-            MD.c.animate.move_cursor(cursor, { max_index, math.min(charinfo.col - 1, max_length) }, SLIDE_MS)
-          end
-        else
-          MD.c.animate.move_cursor(cursor, { cursor[1], math.min(charinfo.col - 1, line[1]:len()) }, SLIDE_MS)
-        end
+        MD.c.animate.move_cursor(cursor, { cursor[1], math.min(charinfo.col - 1, line[1]:len()) }, SLIDE_MS)
+        -- if diff > 0 and (diff / charinfo.col) > 0.1 then
+        --   local jumped = false
+        --   local max_index = nil
+        --   local max_length = 0
+        --   -- for i = 1, 5 do
+        --   --   local l1 = vim.api.nvim_buf_get_lines(0, cursor[1] - 1 + i, cursor[1] + i, false)[1]
+        --   --   local l2 = vim.api.nvim_buf_get_lines(0, cursor[1] - 1 - i, cursor[1] - i, false)[1]
+        --   --   if l1 == nil or l2 == nil then
+        --   --     break
+        --   --   end
+        --   --   if l1:len() > max_length then
+        --   --     max_index = cursor[1] + i - 1
+        --   --     max_length = l1:len()
+        --   --   end
+        --   --   if l2:len() > max_length then
+        --   --     max_index = cursor[1] - i - 1
+        --   --     max_length = l2:len()
+        --   --   end
+        --   --   local diff1 = charinfo.col - l1:len()
+        --   --   local diff2 = charinfo.col - l2:len()
+        --   --   if diff1 < 0 or (diff1 > 0 and (diff1 / charinfo.col) < 0.1) then
+        --   --     jumped = true
+        --   --     MD.c.animate.move_cursor(cursor, { cursor[1] + i - 1, math.min(charinfo.col - 1, l1:len()) }, SLIDE_MS)
+        --   --     break
+        --   --   end
+        --   --   if diff2 < 0 or (diff2 > 0 and (diff2 / charinfo.col) < 0.1) then
+        --   --     jumped = true
+        --   --     MD.c.animate.move_cursor(cursor, { cursor[1] - i - 1, math.min(charinfo.col - 1, l2:len()) }, SLIDE_MS)
+        --   --     break
+        --   --   end
+        --   -- end
+        --   if not jumped then
+        --     P(max_index)
+        --     P(charinfo)
+        --     P(max_length)
+        --     MD.c.animate.move_cursor(cursor, { max_index, math.min(charinfo.col - 1, max_length) }, SLIDE_MS)
+        --   end
+        -- else
+        -- end
       end
       return true
     end

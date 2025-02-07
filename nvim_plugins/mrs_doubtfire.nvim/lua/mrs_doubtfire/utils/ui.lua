@@ -25,13 +25,13 @@ function M.row_range()
   return { M.top_row(), M.bottom_row() }
 end
 
----@return {minY: number, maxY: number, minX: number, maxX: number,}
+---@return {minY: number, maxY: number, minX: number, maxX: number, midX: number, midY: number}
 function M.visible_bounds()
-  local start = M.top_row()
-  local stop = M.bottom_row()
+  local minY = M.top_row() - 1
+  local maxY = M.bottom_row()
   local minX = M.left_col()
   local maxX = M.right_col()
-  return { minY = start - 1, maxY = stop, minX = minX, maxX = maxX }
+  return MD.c.bounds.new({ minY = minY, maxY = maxY, minX = minX, maxX = maxX })
 end
 
 function M.bounds(matches)
